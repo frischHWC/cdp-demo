@@ -1,0 +1,77 @@
+{
+  "policyType": "0",
+  "name": "{{ item.name }}",
+  "isEnabled": true,
+  "policyPriority": 0,
+  "policyLabels": [
+    
+  ],
+  "description": "",
+  "isAuditEnabled": true,
+  "resources": {
+    "schema-group": {
+      "values": [
+        {% for i in item.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-metadata": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-branch": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-version": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    }
+  },
+  "isDenyAllElse": false,
+  "policyItems": [
+    {
+      "users": [
+        {% for i in item.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+      ],
+      "accesses": [
+        {
+          "type": "create",
+          "isAllowed": true
+        },
+        {
+          "type": "read",
+          "isAllowed": true
+        },
+        {
+          "type": "update",
+          "isAllowed": true
+        },
+        {
+          "type": "delete",
+          "isAllowed": true
+        }
+      ]
+    }
+  ],
+  "allowExceptions": [
+    
+  ],
+  "denyPolicyItems": [
+    
+  ],
+  "denyExceptions": [
+    
+  ],
+  "service": "cm_schema-registry"
+}

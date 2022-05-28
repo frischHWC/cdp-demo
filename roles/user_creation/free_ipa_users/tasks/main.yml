@@ -1,0 +1,29 @@
+---
+- name: Create Users
+  ipa_user:
+    name: "{{ user.name }}"
+    givenname: "{{ user.name }}"
+    displayname: "{{ user.name }}"
+    sn: "{{ user.name }}"
+    state: present
+    homedirectory: "{{ user.local_dir | default('/home/' + user.name ) }}"
+    password: "{{ user.password | default( 'Cloudera1234') }}"
+    ipa_host: "{{ free_ipa.server }}"
+    ipa_user: "{{ free_ipa.user }}"
+    ipa_pass: "{{ free_ipa.password }}"
+
+- name: Reset User's password
+  shell: echo -e "{{ user.password | default( 'Cloudera1234') }}\n{{ user.password | default( 'Cloudera1234') }}\n{{ user.password | default( 'Cloudera1234')}}" | kinit "{{ user.name }}"
+
+- name: Create User's group and assign user to it
+  ipa_group:
+    name: "{{ user.group | default( user.name ) }}"
+    user:
+    - "{{ user.name }}"
+    append: yes
+    state: present
+    ipa_host: "{{ free_ipa.server }}"
+    ipa_user: "{{ free_ipa.user }}"
+    ipa_pass: "{{ free_ipa.password }}"
+  ignore_errors: true
+

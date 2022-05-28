@@ -1,0 +1,88 @@
+---
+### GET OZONE CONFIGS ###
+
+- set_fact:
+    ozone_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'OZONE'].name | [0]"
+
+- name: DEBUG - ozone_service_name
+  debug:
+    msg: "{{ ozone_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get Ozone full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ ozone_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: ozone_full_config
+
+- name: Get Ozone Manager full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ ozone_service_name }}/roleConfigGroups/{{ ozone_service_name }}-OZONE_MANAGER-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: ozone_manager_full_config
+
+### SET OZONE CONFIGS ###
+
+- set_fact:
+    ozone_service_id: "{{ ozone_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ozone.service.id'].value | [0]"
+
+- name: DEBUG - ozone_service_id
+  debug:
+    msg: "{{ ozone_service_id }}"
+  when: debug | default(false)  
+
+
+# Kerberos
+- set_fact:
+    ozone_kerberos: "{{ ozone_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ozone.security.enabled'].value | [0]"
+
+- set_fact:
+    ozone_kerberos: "{{ ozone_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ozone.security.enabled' ].default | [0]"
+  when: ozone_kerberos == ''
+
+- name: DEBUG - ozone_kerberos
+  debug:
+    msg: "{{ ozone_kerberos }}"
+  when: debug | default(false)  
+
+
+# TLS
+- set_fact:
+    ozone_tls: "{{ ozone_manager_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].value | [0]"
+
+- set_fact:
+    ozone_tls: "{{ ozone_manager_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].default | [0]"
+  when: ozone_tls == ''
+
+- name: DEBUG - ozone_tls
+  debug:
+    msg: "{{ ozone_tls }}"
+  when: debug | default(false)  
+    

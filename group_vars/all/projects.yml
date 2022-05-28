@@ -1,0 +1,42 @@
+---
+projects:
+  # - name: "test"
+  #   release_type: "tar" # Could be: tar or git or file 
+  #   # => tar = get on a url and untar 
+  #   # => git = git clone 
+  #   # => file = get on a url
+  #   # => local_tar = get a local tar located in roles/project_deployer/tasks/files/
+  #   # => local_file = get a local file located in roles/project_deployer/tasks/files/
+  #   release_url: "" # An URL where file will be downloaded if tar or file as type and clone if git as type 
+  #   maven_compilation: false # default false (if true a 'mvn clean package' is launched)
+  #   files_to_template: "" # config files list to lookup (to replace properties by the one of the cluster) (See README to get details on how to configure this file to be replaced)
+  #   launch_command: "" # Shell command that will launch the program on the remote machine
+
+  - name: "hive_fake_full_data"
+    release_type: "local_file"
+    release_url: "../cdp-demo-examples/hive/hive_test.hql" 
+    files_to_template: []
+    launch_command: "kinit -kt {{ kerb_keytab }} {{ kerb_user }} ; beeline -u {{ hive_jdbc_url }} -f hive_test.hql" 
+
+  - name: "hdfs_ls "
+    release_type: "shell"
+    release_url: "" 
+    files_to_template: []
+    launch_command: "kinit -kt {{ kerb_keytab }} {{ kerb_user }} ; hdfs dfs -ls /user/francois/" 
+
+  - name: "pyspark_sql"
+    release_type: "git"
+    release_url: "https://github.com/frischHWC/cdp-demo-examples.git" 
+    files_to_template: ["pyspark/spark-submit.sh"]
+    launch_command: "./pyspark/spark-submit.sh" 
+
+  - name: "yarn-submit"
+    release_type: "tar"
+    release_url: "https://github.com/frischHWC/yarn-submit/releases/download/CDP-7.1.7-V1/yarnsubmit-CDP-7.1.7-V1.tar.gz" 
+    files_to_template: []
+    launch_command: "chmod +x yarn-submit.sh ; ./yarn-submit.sh --keytab={{ kerb_keytab }} --kerberos-user={{ kerb_user }} --java-home={{ java_home }} commandsToLaunch " 
+
+# TODO: Be able to deploy files and project from local FS
+# TODO: Make git and tar url working
+
+# Add other projects below as the one above

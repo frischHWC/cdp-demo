@@ -1,0 +1,58 @@
+---
+ranger_policies:
+  - name: "HDFS Policy for superman"
+    type: hdfs
+    users: ["superman"]
+    resources: ["/tmp/", "/home/superman"]
+
+  - name: "HDFS Policy for batman"
+    type: hdfs
+    users: ["batman"]
+    resources: ["/tmp/", "/home/batman"]
+
+  - name: "Hbase Policy for superman & batman"
+    type: hbase
+    users: ["superman", "batman"]
+    resources: ["random_datagen:*"] 
+
+  - name: "Hive Policy for superman & batman"
+    type: hive
+    users: ["superman", "batman"]
+    resources: ["random_datagen*"]  
+
+  - name: "Kafka Policy for superman & batman"
+    type: kafka
+    users: ["superman", "batman"]
+    resources: ["random_datagen*"]  
+
+  - name: "Kudu Policy for superman & batman"
+    type: kudu
+    users: ["superman", "batman"]
+    resources: ["random_datagen*"]  
+
+  - name: "Nifi Policy for superman & batman"
+    type: nifi
+    users: ["superman", "batman"]
+    resources: ["/*"]  
+
+  - name: "Ozone Policy for superman & batman"
+    type: ozone
+    users: ["superman", "batman"]
+    resources: ["random-datagen*"]  
+
+  - name: "SR Policy for superman & batman"
+    type: schema-registry
+    users: ["superman", "batman"]
+    resources: ["random_datagen*"]  
+
+  - name: "SolR Policy for superman & batman"
+    type: solr
+    users: ["superman", "batman"]
+    resources: ["random_datagen*"] 
+
+  - name: "YARN Policy for superman & batman"
+    type: yarn
+    users: ["superman", "batman"]
+    resources: ["root.default", "root.random_datagen"]  
+
+# Add other policies below in the same way than the one above   

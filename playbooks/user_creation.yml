@@ -1,0 +1,86 @@
+---
+############# USER CREATION #############
+- name: Create Unix users on all machines
+  hosts: cluster
+  gather_facts: false
+  strategy: free
+  tasks:
+    - name: create Unix User
+      include_role:
+        name: user_creation/unix_users
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+      when: not free_ipa.use
+  tags: 
+    - user_creation 
+
+- name: Fix FreeIPA renew policy
+  hosts: cloudera_manager
+  gather_facts: false
+  roles: 
+    - { role: user_creation/free_ipa_no_renew, when: free_ipa.use }
+  tags: 
+    - user_creation 
+    - kerberos  
+
+- name: Create Free IPA users 
+  hosts: cloudera_manager
+  gather_facts: false
+  tasks:
+    - name: create FreeIPA User
+      include_role:
+        name: user_creation/free_ipa_users
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+      when: free_ipa.use
+  tags: 
+    - user_creation   
+    - free_ipa
+
+- name: Create keytabs for users
+  hosts: cloudera_manager
+  gather_facts: false
+  tasks:
+    - name: create keytabs
+      include_role:
+        name: user_creation/users_keytabs
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+      when: create_keytabs | default(true)
+  tags: 
+    - user_creation 
+    - kerberos  
+
+- name: Push created keytabs to all machines
+  hosts: cluster
+  gather_facts: false
+  strategy: free
+  tasks:
+    - name: create keytabs
+      include_role:
+        name: user_creation/push_users_keytab
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+      when: create_keytabs| default(true)
+  tags: 
+    - user_creation 
+    - kerberos  
+
+- name: Create users directories on HDFS
+  hosts: cloudera_manager
+  gather_facts: false
+  tasks:
+    - name: create HDFS paths
+      include_role:
+        name: user_creation/hdfs_paths
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+      when: create_hdfs_paths | default(true)
+  tags: 
+    - user_creation 
+    - hdfs  

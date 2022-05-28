@@ -1,0 +1,79 @@
+{
+    "id": "1",
+    "guid": "...",
+    "isEnabled": true,
+    "version": 1,
+    "service": "cm_hdfs",
+    "name": "{{ item.name }}",
+    "policyType": 0,
+    "policyPriority": 0,
+    "description": "{{ item.name }}",
+    "isAuditEnabled": true,
+    "resources": {
+      "path": {
+        "values": [
+          {% for i in item.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+        ],
+        "isExcludes": false,
+        "isRecursive": true
+      }
+    },
+    "policyItems": [
+      {
+        "accesses": [
+          {
+            "type": "read",
+            "isAllowed": true
+          },
+          {
+            "type": "write",
+            "isAllowed": true
+          },
+          {
+            "type": "execute",
+            "isAllowed": true
+          }
+        ],
+        "users": [
+          {% for i in item.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+        ],
+        "groups": [
+          
+        ],
+        "roles": [
+          
+        ],
+        "conditions": [
+          
+        ],
+        "delegateAdmin": true
+      }
+    ],
+    "denyPolicyItems": [
+      
+    ],
+    "allowExceptions": [
+      
+    ],
+    "denyExceptions": [
+      
+    ],
+    "dataMaskPolicyItems": [
+      
+    ],
+    "rowFilterPolicyItems": [
+      
+    ],
+    "serviceType": "hdfs",
+    "options": {
+      
+    },
+    "validitySchedules": [
+      
+    ],
+    "policyLabels": [
+      
+    ],
+    "zoneName": "",
+    "isDenyAllElse": false
+  }

@@ -1,0 +1,28 @@
+---  
+- name: Delete previous user's keytab if it exists
+  file:
+    path: "{{ user.local_dir | default('/home/' + user.name ) }}/{{ user.name }}.keytab"
+    state: absent
+  ignore_errors: true
+  
+- name: Create users on kerberos
+  shell:
+    cmd: |
+      echo "addprinc -randkey {{ user.name }}" | kadmin.local
+      echo "addprinc -pw admin {{ user.name }}" | kadmin.local  
+      echo "ktadd -k {{ user.local_dir | default('/home/' + user.name ) }}/{{ user.name }}.keytab {{ user.name }}" | kadmin.local 
+  when: not free_ipa.use
+
+- name: Retrieve Free IPA keytabs using admin user
+  shell:
+    cmd: |
+      echo "{{ free_ipa.password }}" | kinit admin
+      ipa-getkeytab -s "{{ free_ipa.server }}" -p "{{ user.name }}" -k "{{ user.local_dir | default('/home/' + user.name )}}"/"{{ user.name }}".keytab
+      kdestroy
+  when: free_ipa.use
+
+- name: Get Users keytab locally
+  fetch:
+    src: "{{ user.local_dir | default('/home/' + user.name ) }}/{{ user.name }}.keytab"
+    dest: "/tmp/{{ user.name }}-{{ cluster_name }}.keytab"
+    flat: yes

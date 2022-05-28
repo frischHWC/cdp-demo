@@ -1,0 +1,96 @@
+---
+### GET HBASE CONFIGS ###
+
+- set_fact:
+    hbase_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'HBASE'].name | [0]"
+
+- name: DEBUG - hbase_service_name
+  debug:
+    msg: "{{ hbase_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get HBase full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ hbase_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: hbase_full_config
+
+
+### SET HBASE CONFIGS ###
+
+- set_fact:
+    hbase_znode: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'zookeeper_znode_parent'].value | [0]"
+
+- set_fact:
+    hbase_znode: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'zookeeper_znode_parent'].default | [0]"
+  when: hbase_znode == ''
+
+- name: DEBUG - hbase_znode
+  debug:
+    msg: "{{ hbase_znode }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hbase_url: "{{ zk_quorum_with_port }}{{ hbase_znode }}"
+  when: hbase_url is not defined
+
+- name: DEBUG - hbase_url
+  debug:
+    msg: "{{ hbase_url }}"
+  when: debug | default(false)  
+
+
+- set_fact:
+    hbase_auth: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hbase_security_authentication'].value | [0]"
+
+- set_fact:
+    hbase_auth: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hbase_security_authentication'].default | [0]"
+  when: hbase_auth == ''
+
+- name: DEBUG - hbase_auth
+  debug:
+    msg: "{{ hbase_auth }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hbase_kerberos: "{{ true if hbase_auth == 'kerberos' else false }}"
+
+- name: DEBUG - hbase_kerberos
+  debug:
+    msg: "{{ hbase_kerberos }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hbase_tls: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hbase_hadoop_ssl_enabled'].value | [0]"
+
+- set_fact:
+    hbase_tls: "{{ hbase_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hbase_hadoop_ssl_enabled'].default | [0]"
+  when: hbase_tls == ''
+
+- name: DEBUG - hbase_tls
+  debug:
+    msg: "{{ hbase_tls }}"
+  when: debug | default(false)  
+    

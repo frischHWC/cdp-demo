@@ -1,0 +1,7 @@
+---
+- name: Set Free IPA password policies (to not renew password)
+  shell: |
+    "echo {{ free_ipa.password }} | kinit admin"
+    ipa pwpolicy-mod  global_policy --minlife=0
+    kdestroy
+  ignore_errors: true

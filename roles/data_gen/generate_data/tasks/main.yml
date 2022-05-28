@@ -1,0 +1,32 @@
+---
+- set_fact:
+    job_start_cmd: "{{ java_home }}bin/java -jar {{ target_dir }}/random-datagen/random-datagen.jar {{ target_dir }}/random-datagen/models/{{ model.file_name }} {{ model.number_of_rows }} {{ model.number_of_batches }}"
+
+- name: Add Data Generation to local crontab 
+  cron:
+    name: "Data Gen for {{ model.file_name }} to {{ sink }}"
+    minute: "{{ model.frequency.minute }}"
+    hour: "{{ model.frequency.hour }}"
+    day: "{{ model.frequency.day }}"
+    job: "{{ job_start_cmd }} {{ sink }}"
+  loop_control:
+    loop_var: sink
+  loop: "{{ model.sinks }}"
+  when: model.scheduler is defined and model.scheduler == 'cron'
+
+- name: Generates data 
+  command:
+    cmd: "{{ job_start_cmd }} {{ sink }}"
+    chdir: "{{ target_dir }}/random-datagen/"
+  ignore_errors: yes
+  loop_control:
+    loop_var: sink
+  loop: "{{ model.sinks }}"
+  when: model.scheduler is not defined or model.scheduler == 'none'
+
+# TODO: Add Oozie as a scheduler: 
+
+# TODO: Create an HDFS dir /tmp/data_gen with config.properties/log4j.properties/random-datagen.jar in it and also models/ with all models in it
+# TODO: Foreach sink: Template config.properties & coordinator.xml + Copy workflow.xml 
+# TODO: Foreach sink, create HDFS dir: {{ hdfs_url }}/tmp/workflows/{{ file_name }}_{{ sink }}/ & push 3 files to hdfs (config.properties & coordinator.xml & workflow.xml)
+# TODO: Foreach sink, create an oozie job and schedule it

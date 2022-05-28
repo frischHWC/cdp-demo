@@ -1,0 +1,148 @@
+---
+### GET ATLAS CONFIGS ###
+
+- set_fact:
+    atlas_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'ATLAS'].name | [0]"
+
+- name: DEBUG - atlas_service_name
+  debug:
+    msg: "{{ atlas_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get Atlas full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ atlas_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: atlas_full_config
+
+- name: Get Atlas Server full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ atlas_service_name }}/roleConfigGroups/{{ atlas_service_name }}-ATLAS_SERVER-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: atlas_server_full_config
+
+- name: Get Atlas roles repartition
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ atlas_service_name }}/roles"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: atlas_roles
+
+ 
+### SET ATLAS CONFIGS ###
+
+# Kerberos
+- set_fact:
+    atlas_kerberos: "{{ atlas_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'kerberos.auth.enable'].value | [0]"
+
+- set_fact:
+    atlas_kerberos: "{{ atlas_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'kerberos.auth.enable' ].default | [0]"
+  when: atlas_kerberos == ''
+
+- name: DEBUG - atlas_kerberos
+  debug:
+    msg: "{{ atlas_kerberos }}"
+  when: debug | default(false)  
+
+
+# TLS
+- set_fact:
+    atlas_tls: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].value | [0]"
+
+- set_fact:
+    atlas_tls: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].default | [0]"
+  when: atlas_tls == ''
+
+- name: DEBUG - atlas_tls
+  debug:
+    msg: "{{ atlas_tls }}"
+  when: debug | default(false)  
+
+
+# Set Atlas URL
+
+- set_fact:
+    atlas_port: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'atlas_server_https_port'].value | [0]"
+  when: atlas_tls
+
+- set_fact:
+    atlas_port: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'atlas_server_https_port'].default | [0]"
+  when: atlas_tls and atlas_port == ""
+
+- set_fact:
+    atlas_port: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'atlas_server_http_port'].value | [0]"
+  when: not atlas_tls
+
+- set_fact:
+    atlas_port: "{{ atlas_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'atlas_server_http_port'].default | [0]"
+  when: not atlas_tls and atlas_port == ""
+
+- name: DEBUG - atlas_port
+  debug:
+    msg: "{{ atlas_port }}"
+  when: debug | default(false)
+
+- set_fact:
+    atlas_protocol: "https"
+  when: atlas_tls
+
+- set_fact:
+    atlas_protocol: "http"
+  when: not atlas_tls
+
+- set_fact:
+    atlas_host: "{{ atlas_roles.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'ATLAS_SERVER'].hostRef.hostname | [0]"
+
+- name: DEBUG - atlas_host
+  debug:
+    msg: "{{ atlas_host }}"
+  when: debug | default(false)
+
+- set_fact:
+    atlas_url: "{{ atlas_protocol }}://{{ atlas_host }}:{{ atlas_port }}/"
+
+- name: DEBUG - atlas_url
+  debug:
+    msg: "{{ atlas_url }}"
+  when: debug | default(false)

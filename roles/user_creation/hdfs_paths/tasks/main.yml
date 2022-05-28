@@ -1,0 +1,12 @@
+---
+- name: Create HDFS paths
+  shell: | 
+    curl -k -X POST -H "Content-Type: application/json" -d "{ \"items\": [ \"hdfs/$(hostname -f)@{{ kerb_realm }}\" ] }" -u admin:admin https://localhost:7183/api/v45/cm/retrieveKeytab > /tmp/hdfs-temp.keytab
+    kinit -kt /tmp/hdfs-temp.keytab hdfs/$(hostname -f)
+    hdfs dfs -mkdir -p "{{ user.hdfs_dir | default('/home/' + user.name ) }}"
+    hdfs dfs -chmod 755 "{{ user.hdfs_dir | default('/home/' + user.name ) }}"
+    hdfs dfs -chown "{{ user.name }}":"{{ user.name }}" "{{ user.hdfs_dir | default('/home/' + user.name ) }}"
+    kdestroy
+    rm -f /tmp/hdfs-temp.keytab
+  args:
+    warn: false

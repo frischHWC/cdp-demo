@@ -1,0 +1,117 @@
+---
+### GET HDFS CONFIGS ###
+
+- set_fact:
+    hdfs_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'HDFS'].name | [0]"
+
+- name: DEBUG - hdfs_service_name
+  debug:
+    msg: "{{ hdfs_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get HDFS full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ hdfs_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: hdfs_full_config
+
+- name: Get HDFS Namenode full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ hdfs_service_name }}/roleConfigGroups/{{ hdfs_service_name }}-NAMENODE-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: hdfs_namenode_full_config
+
+
+### SET HDFS CONFIGS ###
+
+- set_fact:
+    hdfs_nameservice: "{{ hdfs_namenode_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'dfs_federation_namenode_nameservice'].value | [0]"
+
+- name: DEBUG - hdfs_nameservice
+  debug:
+    msg: "{{ hdfs_nameservice }}"
+  when: debug | default(false)  
+    
+- set_fact:
+    hdfs_port: "{{ hdfs_namenode_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'namenode_port'].value | [0]"
+
+- set_fact:
+    hdfs_port: "{{ hdfs_namenode_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'namenode_port'].default | [0]"
+  when: hdfs_port == ''
+
+- name: DEBUG - hdfs_port
+  debug:
+    msg: "{{ hdfs_port }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hdfs_uri: "hdfs://{{ hdfs_nameservice | default('') }}:{{ hdfs_port }}/"
+
+- name: DEBUG - hdfs_uri
+  debug:
+    msg: "{{ hdfs_uri }}"
+  when: debug | default(false)  
+    
+
+- set_fact:
+    hdfs_auth: "{{ hdfs_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hadoop_security_authentication'].value | [0]"
+
+- set_fact:
+    hdfs_auth: "{{ hdfs_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hadoop_security_authentication'].default | [0]"
+  when: hdfs_auth == ''
+
+- name: DEBUG - hdfs_auth
+  debug:
+    msg: "{{ hdfs_auth }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hdfs_kerberos: "{{ true if hdfs_auth == 'kerberos' else false }}"
+
+- name: DEBUG - hdfs_kerberos
+  debug:
+    msg: "{{ hdfs_kerberos }}"
+  when: debug | default(false)  
+
+- set_fact:
+    hdfs_tls: "{{ hdfs_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hdfs_hadoop_ssl_enabled'].value | [0]"
+
+- set_fact:
+    hdfs_tls: "{{ hdfs_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'hdfs_hadoop_ssl_enabled'].default | [0]"
+  when: hdfs_tls == ''  
+
+- name: DEBUG - hdfs_tls
+  debug:
+    msg: "{{ hdfs_tls }}"
+  when: debug | default(false)  

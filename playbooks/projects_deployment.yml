@@ -1,0 +1,50 @@
+---
+
+###############################################
+############# PROJECT DEPLOYMENTS #############
+
+- name: Auto-Configure
+  hosts: cloudera_manager
+  gather_facts: false
+  roles: 
+    - auto_configure/cm-config
+    - auto_configure/all-config
+    - { role: auto_configure/zookeeper-config, when: config_zookeeper }
+    - { role: auto_configure/ranger-config, when: config_ranger }
+    - { role: auto_configure/hive-config, when: config_hive }
+    - { role: auto_configure/hbase-config, when: config_hbase }
+    - { role: auto_configure/solr-config, when: config_solr }
+    - { role: auto_configure/kudu-config, when: config_kudu }
+    - { role: auto_configure/ozone-config, when: config_ozone }
+    - { role: auto_configure/hdfs-config, when: config_hdfs }
+    - { role: auto_configure/schema-registry-config, when: config_schema_registry }
+    - { role: auto_configure/kafka-config, when: config_kafka }
+    - { role: auto_configure/knox-config, when: config_knox }
+    - { role: auto_configure/atlas-config, when: config_atlas } 
+  tags: 
+    - auto_configure 
+    - deployments
+
+- name: Prepare deployments
+  hosts: cloudera_manager
+  gather_facts: false
+  roles: 
+    - prepare_deployments
+  tags:
+    - deployments
+
+- name: Deploy projects defined in projects file
+  hosts: cloudera_manager
+  gather_facts: false
+  environment: 
+    JAVA_HOME: "{{ java_home }}"
+  tasks:
+    - name: deploy projects
+      include_role:
+        name: project_deployer/
+      vars:
+        project: "{{ item }}"
+      with_items: "{{ projects }}"
+  tags:
+    - deployments  
+    - project_deployments

@@ -1,0 +1,397 @@
+# CDP Demo
+
+CDP - Demos is a one click script easily configurable and extensible, relying on Ansible Playbooks to create users, data and projects on your CDP paltform, ideal to make demos or first tests on a cluster.
+
+CDP - Demo consists of 4 independent steps:
+
+  - Create Users
+  - Create Ranger Policies
+  - Load Random Demo Data 
+  - Deploy projects
+
+
+## Requirements
+
+- Have Ansible installed in version >= 2.10 
+
+- Have jq installed 
+
+- Have a running and working CDP cluster with CM access
+
+
+__ Note: Only on CDP PvC 7.1.7 & CM 7.4.4+ (Java 11 required for Random Data Generation) __
+
+
+## How to run it ? 
+
+There is a main script that will configure the ansible and run it.
+
+It will only requires few basic parameters, here is how to launch it:
+
+        ./cdp_demo.sh \
+            --cluster-name=${CLUSTER_NAME} \
+            --cm-host=${CM_HOST} \
+            --ssh-password=${PASSWORD} 
+
+
+__Note: You can also specify an --ssh-key instead of a password to connect to cluster nodes__
+
+To get more available parameters and run it with different settings, launch:
+
+        ./cdp_demo.sh -h 
+
+
+## Examples
+
+### Specify Kerberos user
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --kerberos-user=francois \
+        --kerberos-realm=FRISCH.COM \
+        --kerberos-user-keytab=/home/francois/my.keytab
+
+
+### CDP and specify passwords for CM & Ranger
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --cm-user=cm_admin \
+        --cm-password=Test1234 \
+        --ranger-user=rangerAdminUser \
+        --ranger-password=Ranger1234!
+
+
+### Connect to nodes with a private key
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-key=/Users/francois/my.sshkey 
+
+
+### CDP with a Free IPA 
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --use-ipa=true \
+        --ipa-user=admin-user \
+        --ipa-password=stR0ngPas$wôrd \
+        --ipa-server=my.ipa.server.com
+
+### Please skip user creation 
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --user-creation=false \
+        --ranger-policies=false 
+
+
+### Only Do Projects Deployments 
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --user-creation=false \
+        --ranger-policies=false \
+        --data-generation=false \
+        --projects-deployment=true
+
+
+### Debug Me
+
+    ./cdp_demo.sh \
+        --cluster-name=francois-cluster \
+        --cm-host=my.beautiful.cloudera.manager.com \
+        --ssh-password=myPasswOrd \
+        --debug=true
+
+
+## How to configure it to your needs ?
+
+### Users
+
+You can define easily new users under file link:groups_vars/all/users.yml[groups_vars/all/users.yml].
+
+They will be automatically picked up and created on all machines, have keytabs generated and set to all hosts (or with password), and HDFS home directory created.
+
+Template:
+
+  users:
+    - name: francois
+      local_dir: /home/francois # default is /home/{{ name }}
+      hdfs_dir: /user/francois # default is /user/{{ name }}
+      use_keytab: true # default is true
+      password: Cloudera1234 # default is Cloudera1234
+      groups: ["hadoop"] # default is user name
+
+
+Two default users are created: francois and fri (but you can change/remove them for sure).
+
+
+### Ranger Policies
+
+Once Users are created, Ranger policies are usually needed to provide rights. This is done using file link:groups_vars/all/ranger.yml[groups_vars/all/ranger.yml].
+
+All services existing in Ranger are supported and only users (one can be set) and resources (corresponding to paths, databases etc...) must be provided.
+
+Template:
+
+        ranger_policies:
+          - name: "Policy name for francois"
+            type: hdfs
+            users: ["francois"]
+            resources: ["/tmp/test", "/home/francois"]
+
+Default policies are set for users francois & fri to all types of services.
+
+
+### Data Generation
+
+Data Generation in all possible services existing on the cluster is made: HDFS, Hive, HBase, Kudu, Kafka, SolR, Ozone.
+
+However, it is possible to disable this generation by setting variable ``data_generation`` to false in link:extra-vars.yml[extra-vars.yml].
+
+It is possible to create custom data to generate data, juste add model files in folder: link:roles/data_gen/models/[roles/data_gen/models/], they will be taken to generate data in all sinks.
+
+Documentation on how to create models files: link:https://github.com/frischHWC/random-datagen/tree/master#data-generated[https://github.com/frischHWC/random-datagen/tree/master#data-generated]
+
+Template:
+
+        models: 
+        - file_name: full-model.json # Model File name presents in roles/data_gen/models
+           sinks: [hdfs-parquet, hbase, hive] # A list of sinks where to produce data among: hdfs-parquet, hdfs-orc, hdfs-avro, hdfs-csv, hdfs-json, hbase, hive, kafka, kudu, ozone, solr
+           number_of_rows: 100000 # Number of rows to produce on each batch
+           number_of_batches: 10 # Number of batch to launch
+
+
+### Project Deployments
+
+Once data generation, multiple side projects are setup and launched, it is possible to add your owns and configure them for automatic deploy.
+
+Using file link:groups_vars/all/projects.yml[groups_vars/all/projects.yml], you can provide type of projects to deploy (will it be a git repo a tar or a file to dowload), URL where to get the project, how to launch it, if it requires to be compiled and how to configure it.
+
+
+Template is as follow:
+
+        projects:
+          - name: "test"
+            release_type: "tar" # Could be: tar or git or file 
+              # => tar = get on a url and untar 
+              # => git = git clone 
+              # => file = get on a url
+              # => local_tar = get a local tar located in roles/project_deployer/files/
+              # => local_file = get a local file located in roles/project_deployer/files/
+              # => shell = just a shell command that will be executed remotely
+            release_url: "" # An URL where file will be downloaded if tar or file as type and clone if git as type 
+            maven_compilation: false # default false (if true a 'mvn clean package' is launched)
+            files_to_template: "" # config files list to lookup (to replace properties by the one of the cluster) (See README to get details on how to configure         this file to be replaced)
+            launch_command: "" # Shell command that will launch the program on the remote machine
+
+
+IMPORTANT: A lot of variables are available to configure projects (either in files_to_template or in launch_command) allowing someone to use common configuration (that will be provided below) and could work on all different deployments.
+
+Configuration files and command are Jinja Templated, meaning variables retrieved during this Ansible program can be injected to programs deployed.
+
+To use them, set them like this in config files or commands: "{{ var_to_use }}"
+
+List of availables variables (with default example values):
+
+#### Authentication
+
+- kerb_auth = true/false
+- kerb_user = francois@FRISCH.COM
+- kerb_keytab = /home/francois/francois.keytab
+- hadoop_user = francois
+- hadoop_home = /user/francois
+- user = francois
+
+#### Atlas
+
+- atlas_kerberos = true/false
+- atlas_tls = true/false
+- atlas_port = 31443
+- atlas_protocol = https
+- atlas_host = atlas-server
+- atlas_url = https://atlas-server:31443/
+
+#### CM 
+
+- cloudera_manager_protocol = https
+- cloudera_manager_host = cloudera-manager
+- cloudera_manager_port = 7183
+- cloudera_manager_api_version = v44
+- cloudera_manager_url = https://cloudera-manager:7183/
+- cloudera_manager_api__url = https://cloudera-manager:7183/api/v44
+
+#### Security
+
+- kerberos_activated = true/false
+- krb_realm = FRISCH.COM
+- tls_activated = true/false
+- truststore_location = /tmp/truststore.jks
+- truststore_password = ....
+- keystore = /var/lib/cloudera-scm-agent/agent-cert/cm-auto-host_keystore.jks
+- keystore_password = ....
+- keystore_pass = keystore_password in base 64 encoded
+
+#### Cluster Related
+
+- cluster_name = dev-cluster
+- cdp_version = 7.1.7
+- java_home = /usr/lib/jvm/java-11/
+
+#### HBase
+
+- hbase_znode = hbase
+- hbase_auth = kerberos/simple
+- hbase_kerberos = true/false
+- hbase_tls = true/false
+- hbase_url = zk_host_1:2181,zk_host_2:2181,zk_host_3:2181/hbase
+
+#### HDFS
+
+- hdfs_nameservice = hdfs-nameservice
+- hdfs_port = 8020
+- hdfs_auth = kerberos/simple
+- hdfs_kerberos = true/false
+- hdfs_tls = true/false
+
+
+#### HIVE
+
+- hive_zk_namespace = hiveserver2
+- tez_queue_name = root.default
+- hive_kerberos = true/false
+- hive_tls = true/false
+- hive_jdbc_url = jdbc:hive2://zk_1:2181,zk_2:2181,zk_3:2181/default;principal=hive/_HOST@FRISCH.COM;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2;ssl=true;sslTrustStore=/tmp/truststore.jks;trustStorePassword=truststore_password;
+
+#### KAFKA
+
+- kafka_ssl = true/false
+- kafka_sasl = true/false
+- kafka_protocol = SASL_SSL
+- kafka_port = 9093
+- kafka_url = kafka1:9093,kafka2:9093,kafka3:9093
+- kafka_kerberos = true/false
+- kafka_tls = true/false
+- kafka_zk_url = zk1:2181,zk2:2181,zk3:2181/kafka
+
+
+#### KNOX
+
+- knox_kerberos = true/false
+- knox_tls = true/false
+- knox_port = 8443
+- knox_protocol = https
+- knox_host = knox-server
+- knox_url = https://knox-server:8443/
+
+
+#### KUDU
+
+- kudu_url = kudu1:7051,kudu2:7051,kudu3:7051
+- kudu_kerberos = true/false
+- kudu_tls = true/false 
+
+
+#### OZONE
+
+- ozone_service_id = ozone-dev
+- ozone_kerberos = true/false
+- ozone_tls = true/false
+
+
+#### RANGER
+
+- ranger_ssl = true/false
+- ranger_protocol = https
+- ranger_port = 6080
+- ranger_url = https://ranger-server:6182/
+
+#### SCHEMA-REGISTRY
+
+- sr_ssl = true/false
+- sr_port = 7790
+- sr_url = schemar1:7790,schemar2:7790
+- sr_kerberos = true/false
+- sr_tls = true/false
+
+#### SOLR
+
+- solr_ssl = true/false
+- solr_protocol = https
+- solr_port = 8985
+- solr_url = https://solr-server
+- solr_kerberos = true/false
+- solr_tls = true/false
+
+#### ZOOKEEPER
+
+- zk_port = 2181
+- zk_quorum = zk1,zk2,zk3
+- zk_quorum_with_port = zk1:2181,zk2:2181,zk3:2181
+- zk_kerberos = true/false
+- zk_tls = true/false
+
+## Code Architecture
+
+### Main.yml
+
+Playbook that will launch all roles in right order.
+
+### Group_Vars
+
+Folder with different files that will contain all variables used by all playbooks/.
+
+### Extra_vars.yml
+
+Use this file, passed in command line or --extra-vars to give minimum necessary args 
+
+### Users
+
+1. Create users (based in config file with home dir & password configurable)
+2. Create users keytabs (and push it to home dir or create user in KDC with only password if asked)
+3. Create users HDFS paths (based on config)
+
+### Auto-configure
+
+1. Using CM APIs, get all required properties and configurations 
+
+### Ranger
+
+1. Push to Ranger all policies define in one dir
+2. Generates ranger json to push using ansible variables
+
+### Datagenerator
+
+1. Pull Random-Datagen project from Git (link: https://github.com/frischHWC/random-datagen[https://github.com/frischHWC/random-datagen]) 
+2. Configure the project with settings from the cluster
+3. Launch Random-Datagen multiple times according to config: user, quantity, batch, model, sink
+
+### Deployer
+
+1. Ansible playbook to deploy and configure a project (generically) to a cluster
+
+### Jobs
+
+Collection of different jobs (HQL/PySpark/Spark Scala/Flink etc...)
+
+1. Use Deployer to deploy these jobs to the platform and auto-configure them according to config: job git or directory, command to launch it
+
+
+
+## TODOs
+
+ - Add Oozie Scheduler
+ - Add local file deployment for projects deployment
+ - Prepare Models for an entire demo

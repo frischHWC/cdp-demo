@@ -1,0 +1,8 @@
+---
+- name: Create Unix users
+  user:
+    name: "{{ user.name }}"
+    shell: /bin/bash
+    home: "{{ user.local_dir | default('/home/' + user.name ) }}"
+    groups: "{{ user.groups | default( user.name ) }}"
+    password: "{{ user.password | default( 'Cloudera1234') | password_hash('sha512') }}"  

@@ -1,0 +1,14 @@
+---
+###########################################
+############# RANGER POLICIES #############
+
+- name: Ranger Policies
+  hosts: cloudera_manager
+  gather_facts: false
+  roles: 
+    - auto_configure/cm-config
+    - auto_configure/all-config
+    - { role: auto_configure/ranger-config, when: config_ranger }
+    - ranger_policies
+  tags:
+    - ranger  

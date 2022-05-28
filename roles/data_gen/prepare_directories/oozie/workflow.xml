@@ -1,0 +1,25 @@
+<workflow-app xmlns='uri:oozie:workflow:0.3' name='shell-wf'>
+    <start to='shell1' />
+    <action name='shell1'>
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                  <name>mapred.job.queue.name</name>
+                  <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>${java_home}bin/java -jar random-datagen.jar ${model} ${rows} ${batches}</exec>
+            <file>random-datagen.jar</file> <!--Copy the executable to compute node's current working directory -->
+            <file>${model}</file>
+            <file>config.properties</file>  
+        </shell>
+        <ok to="end" />
+        <error to="fail" />
+    </action>
+    <kill name="fail">
+        <message>Script failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name='end' />
+</workflow-app>

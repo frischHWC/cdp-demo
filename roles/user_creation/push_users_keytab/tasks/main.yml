@@ -1,0 +1,8 @@
+---                    
+- name: Copy Users' keytab to all nodes
+  copy:
+    src: "/tmp/{{ user.name }}-{{ cluster_name }}.keytab"
+    dest:  "{{ user.local_dir | default('/home/' + user.name )}}/{{ user.name }}.keytab"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0400

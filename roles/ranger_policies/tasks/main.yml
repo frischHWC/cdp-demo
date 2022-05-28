@@ -1,0 +1,15 @@
+---
+- name: Post Ranger policies defined in ranger_policies variable
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ item.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_policies }}"
+  ignore_errors: yes

@@ -1,0 +1,135 @@
+---
+### GET knox CONFIGS ###
+
+- set_fact:
+    knox_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KNOX'].name | [0]"
+
+- name: DEBUG - knox_service_name
+  debug:
+    msg: "{{ knox_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get knox full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ knox_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: knox_full_config
+
+- name: Get knox Server full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ knox_service_name }}/roleConfigGroups/{{ knox_service_name }}-KNOX_GATEWAY-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: knox_server_full_config
+
+- name: Get knox roles repartition
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ knox_service_name }}/roles"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: knox_roles
+
+ 
+### SET knox CONFIGS ###
+
+# Kerberos
+- set_fact:
+    knox_kerberos: "{{ knox_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'kerberos.auth.enabled'].value | [0]"
+
+- set_fact:
+    knox_kerberos: "{{ knox_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'kerberos.auth.enabled' ].default | [0]"
+  when: knox_kerberos == ''
+
+- name: DEBUG - knox_kerberos
+  debug:
+    msg: "{{ knox_kerberos }}"
+  when: debug | default(false)  
+
+
+# TLS
+- set_fact:
+    knox_tls: "{{ knox_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].value | [0]"
+
+- set_fact:
+    knox_tls: "{{ knox_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].default | [0]"
+  when: knox_tls == ''
+
+- name: DEBUG - knox_tls
+  debug:
+    msg: "{{ knox_tls }}"
+  when: debug | default(false)  
+
+
+# Set knox URL
+
+- set_fact:
+    knox_port: "{{ knox_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'gateway_port'].value | [0]"
+
+- set_fact:
+    knox_port: "{{ knox_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'gateway_port'].default | [0]"
+  when: knox_port == ""
+
+- name: DEBUG - knox_port
+  debug:
+    msg: "{{ knox_port }}"
+  when: debug | default(false)
+
+- set_fact:
+    knox_protocol: "https"
+  when: knox_tls
+
+- set_fact:
+    knox_protocol: "http"
+  when: not knox_tls
+
+- set_fact:
+    knox_host: "{{ knox_roles.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KNOX_GATEWAY'].hostRef.hostname | [0]"
+
+- name: DEBUG - knox_host
+  debug:
+    msg: "{{ knox_host }}"
+  when: debug | default(false)
+
+- set_fact:
+    knox_url: "{{ knox_protocol }}://{{ knox_host }}:{{ knox_port }}/"
+
+- name: DEBUG - knox_url
+  debug:
+    msg: "{{ knox_url }}"
+  when: debug | default(false)

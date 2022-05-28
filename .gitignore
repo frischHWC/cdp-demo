@@ -1,0 +1,10 @@
+launch.sh
+launch*.sh
+.DS_store
+secrets.yml
+*.keytab
+*/*.keytab
+playbooks/post_install/action_plugins/__pycache__/*
+playbooks/post_install/action_plugins/__pycache__
+playbooks/post_install/cm_config/action_plugins/__pycache__/*
+playbooks/post_install/cm_config/action_plugins/__pycache__

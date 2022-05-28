@@ -1,0 +1,91 @@
+---
+# Clean & Create dir
+- set_fact:
+    local_project_dir: "{{ target_dir }}/projects/{{ project.name }}"
+
+- name: Clean old potential existing files
+  file:
+    path: "{{ local_project_dir }}"
+    state: absent
+
+- name: Create directory 
+  file:
+    path: "{{ local_project_dir }}"
+    state: directory
+
+
+# Use git type
+- name: Clone Repository
+  git:
+    repo: "{{ project.release_url }}"
+    dest: "{{ local_project_dir }}"
+  when: project.release_type == "git"   
+
+- name: Clean & Package Project with Maven if needed
+  command:
+    cmd: mvn clean package
+    chdir: "{{ local_project_dir }}"
+  when: project.release_type == "git" and maven_compilation | default(false)
+
+
+# Use tar or file type (get Tar/File from URL)
+- name: Get file(s) as tar or raw
+  get_url:
+    url: "{{ project.release_url }}"
+    dest: "{{ local_project_dir }}"
+  when: project.release_type == "tar" or project.release_type == "file"
+
+# Use local file or tar type
+- name: Get Local file(s) as tar or raw
+  copy:
+    src: "{{ project.release_url }}"
+    dest: "{{ local_project_dir }}"
+  when: project.release_type == "local_file" or project.release_type == "local_tar"
+
+- name: Register tar file to Untar
+  find:
+    paths: "{{ local_project_dir }}/"
+    patterns: '*.tar.gz,*.tar'
+  register: tar_to_untar
+  when: project.release_type == "tar" or project.release_type == "local_tar"
+
+- name: Untar project
+  unarchive:
+    src: "{{ tar_file.path }}"
+    dest: "{{ local_project_dir }}"
+    remote_src: yes
+  loop_control:
+    loop_var: tar_file
+  loop: "{{ tar_to_untar.files }}"
+  when: project.release_type == "tar" or project.release_type == "local_tar"
+
+
+# Template configuration files given
+- name: Fetch configuration files
+  fetch:
+    src: "{{ local_project_dir }}/{{ config_file }}"
+    dest: "/tmp/"
+  loop_control:
+    loop_var: config_file
+  loop: "{{ project.files_to_template }}"
+  when: project.files_to_template is defined
+
+- name: Inject properties into configuration files
+  template:
+    src: "/tmp/{{ inventory_hostname }}{{ local_project_dir }}/{{ config_file }}"
+    dest: "{{ local_project_dir }}/{{ config_file }}"
+  loop_control:
+    loop_var: config_file
+  loop: "{{ project.files_to_template }}"
+  when: project.files_to_template is defined
+
+
+# Launch the project using shell command provided
+- name: Launch project
+  shell: 
+    cmd: " {{ project.launch_command }} "
+    chdir: "{{ local_project_dir }}"
+  args:
+    warn: false
+  when: project.launch_command is defined
+  ignore_errors: true
