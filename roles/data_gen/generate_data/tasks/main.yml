@@ -1,6 +1,6 @@
 ---
 - set_fact:
-    job_start_cmd: "{{ java_home }}bin/java -jar {{ target_dir }}/random-datagen/random-datagen.jar {{ target_dir }}/random-datagen/models/{{ model.file_name }} {{ model.number_of_rows }} {{ model.number_of_batches }}"
+    job_start_cmd: "{{ java_home }}bin/java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar {{ target_dir }}/random-datagen/random-datagen.jar {{ target_dir }}/random-datagen/models/{{ model.file_name }} {{ model.number_of_rows }} {{ model.number_of_batches }}"
 
 - name: Add Data Generation to local crontab 
   cron:

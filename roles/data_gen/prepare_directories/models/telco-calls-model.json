@@ -1,0 +1,93 @@
+{
+  "Fields": [
+    {
+      "name": "account_id_calling",
+      "type": "INTEGER"
+    },
+    {
+      "name": "account_id_receiving",
+      "type": "INTEGER"
+    },
+    {
+      "name": "starting_time",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "duration_in_seconds",
+      "type": "INTEGER",
+      "min": 0,
+      "max": 3600
+    },
+    {
+      "name": "antennas_code",
+      "type": "CSV",
+      "filters": ["operateur=BOUYGUES"],
+      "file": "{{ target_dir }}/random-datagen/extra_data/antennes-relais.csv",
+      "field": "code_site"
+    },
+    {
+      "name": "antennas_geo_point",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$antennas_code.geo_point_2d"
+      }
+    },
+    {
+      "name": "antennas_address",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$antennas_code.adresse"
+      }
+    }
+  ],
+  "Table_Names": [
+    {"HDFS_FILE_PATH": "/tmp/telco/hdfs/calls/"},
+    {"HDFS_FILE_NAME": "calls"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/telco/hive/calls/"},
+    {"HBASE_TABLE_NAME": "calls"},
+    {"HBASE_NAMESPACE": "telco"},
+    {"KAFKA_TOPIC": "random_datagen_telco_calls"},
+    {"OZONE_VOLUME": "telco_calls"},
+    {"SOLR_COLLECTION": "telco_calls"},
+    {"HIVE_DATABASE": "telco"},
+    {"HIVE_TABLE_NAME":  "calls"},
+    {"HIVE_TEMPORARY_TABLE_NAME":  "calls_tmp"},
+    {"KUDU_TABLE_NAME":  "telco.calls"},
+    {"LOCAL_FILE_PATH":  "/tmp/telco/calls/"},
+    {"LOCAL_FILE_NAME":  "calls"},
+    {"AVRO_NAME":  "calls"}
+  ],
+  "Primary_Keys": [
+    {"KAFKA_MSG_KEY": "account_id_calling"},
+    {"HBASE_PRIMARY_KEY":  "account_id_calling"},
+    {"OZONE_BUCKET":  "antennas_code"},
+    {"OZONE_KEY":  "account_id_calling"},
+    {"KUDU_PRIMARY_KEYS":  "account_id_calling,account_id_receiving"},
+    {"KUDU_HASH_KEYS":  "account_id_receiving"},
+    {"KUDU_RANGE_KEYS":  "account_id_calling,account_id_receiving"}
+  ],
+  "Options": [
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "t:account_id_calling,account_id_calling,starting_time,duration_in_seconds;a:antennas_code,antennas_geo_point,antennas_address"},
+    {"SOLR_SHARDS":  1},
+    {"SOLR_REPLICAS":  1},
+    {"KUDU_REPLICAS":  1},
+    {"ONE_FILE_PER_ITERATION":  true},
+    {"KAFKA_MESSAGE_TYPE":  "json"},
+    {"HIVE_THREAD_NUMBER":  1},
+    {"HIVE_ON_HDFS":  true},
+    {"HIVE_TEZ_QUEUE_NAME":  "root.default"},
+    {"CSV_HEADER":  true},
+    {"DELETE_PREVIOUS":  false},
+    {"PARQUET_PAGE_SIZE":  1048576},
+    {"PARQUET_ROW_GROUP_SIZE":  134217728},
+    {"PARQUET_DICTIONARY_PAGE_SIZE":  1048576},
+    {"PARQUET_DICTIONARY_ENCODING":  true},
+    {"KAFKA_ACKS_CONFIG":  "all"},
+    {"KAFKA_RETRIES_CONFIG":  3},
+    {"KUDU_BUCKETS":  32},
+    {"KUDU_BUFFER":  100001},
+    {"KUDU_FLUSH":  "MANUAL_FLUSH"},
+    {"OZONE_REPLICATION_FACTOR":  3},
+    {"HDFS_REPLICATION_FACTOR":  3}
+  ]
+}

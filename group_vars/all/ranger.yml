@@ -56,3 +56,8 @@ ranger_policies:
     resources: ["root.default", "root.random_datagen"]  
 
 # Add other policies below in the same way than the one above   
+
+  - name: "Hive Policy on telco"
+    type: hive
+    users: ["superman", "francois"]
+    resources: ["telco"] 

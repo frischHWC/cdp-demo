@@ -165,6 +165,20 @@
     {
       "name": "ip",
       "type": "IP"
+    },
+    {
+      "name": "person",
+      "type": "CSV",
+      "filters": ["country=France"],
+      "file": "{{ target_dir }}/random-datagen/extra_data/person_test.csv",
+      "field": "name"
+    },
+    {
+      "name": "person_department",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$person.department"
+      }
     }
   ],
   "Table_Names": [

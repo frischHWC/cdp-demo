@@ -10,20 +10,26 @@ models:
         # day: "*"
   #   scheduler: none # To schedule the job according to cron-frequency set above using either 'cron' or 'oozie', 'none' will no schedule
 
+  - file_name: telco-calls-model.json 
+    sinks: [hive] 
+    number_of_rows: 1000
+    number_of_batches: 2 
+
   - file_name: full-model.json 
     sinks: [hdfs-parquet, hdfs-orc, hdfs-avro, hdfs-csv, hdfs-json, hbase, hive, kafka, ozone, solr] 
     number_of_rows: 1000
     number_of_batches: 2 
 
-  - file_name: finance-transaction-model.json 
-    sinks: [kafka] 
-    number_of_rows: 1000
-    number_of_batches: 1
-    frequency: 
-      minute: "*/5"
-      hour: "*"
-      day: "*"
-    scheduler: cron
+  # - file_name: finance-transaction-model.json 
+  #   sinks: [kafka] 
+  #   number_of_rows: 1000
+  #   number_of_batches: 1
+  #   frequency: 
+  #     minute: "*/5"
+  #     hour: "*"
+  #     day: "*"
+  #   scheduler: cron
+
     
 
 # Add other models' file (check README for syntax) and sinks like examples above
