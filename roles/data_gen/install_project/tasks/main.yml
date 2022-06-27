@@ -31,6 +31,11 @@
     release_url: "https://github.com/frischHWC/random-datagen/releases/download/CDP-{{ cdp_version }}/random-datagen-CDP-{{ cdp_version }}.tar.gz"
   when: release_url is not defined and not data_gen_use_git
 
+- name: DEBUG - release_url
+  debug:
+    msg: "{{ release_url }}"
+  when: release_url is defined and debug | default(false)
+
 - name: Get random datagen jar and files
   get_url:
     url: "{{ release_url }}"

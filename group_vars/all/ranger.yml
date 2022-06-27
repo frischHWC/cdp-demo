@@ -13,7 +13,7 @@ ranger_policies:
   - name: "Hbase Policy for superman & batman"
     type: hbase
     users: ["superman", "batman"]
-    resources: ["random_datagen:*"] 
+    resources: ["random_datagen:*", "rd:*"] 
 
   - name: "Hive Policy for superman & batman"
     type: hive
