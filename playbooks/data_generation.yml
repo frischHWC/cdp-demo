@@ -3,7 +3,7 @@
 ############# DATA GENERATION #############
 
 - name: Auto-Configure
-  hosts: cloudera_manager
+  hosts: edge
   gather_facts: false
   roles: 
     - auto_configure/cm-config
@@ -22,7 +22,7 @@
     - data
 
 - name: Preparation of Data Generation
-  hosts: cloudera_manager
+  hosts: edge
   gather_facts: false
   environment: 
     JAVA_HOME: "{{ java_home }}"
@@ -34,7 +34,7 @@
     - data  
 
 - name: Data Generation 
-  hosts: cloudera_manager
+  hosts: edge
   gather_facts: false
   environment: 
     JAVA_HOME: "{{ java_home }}"

@@ -4,7 +4,7 @@
 - set_fact:
     solr_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
-    query: "items[?type == 'SOLR'].name | [1]"
+    query: "items[?type == 'SOLR' && name != 'infra_solr'].name | [0]"
 
 - name: DEBUG - solr_service_name
   debug:

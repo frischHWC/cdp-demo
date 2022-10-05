@@ -7,6 +7,7 @@ echo "*********************"
 # Required variables
 export CLUSTER_NAME=""
 export CM_HOST=""
+export EDGE_HOST=""
 export SSH_KEY=""
 export SSH_PASSWORD=""
 
@@ -16,9 +17,9 @@ export CM_PASSWORD="admin"
 export RANGER_USER="admin"
 export RANGER_PASSWORD="Cloudera1234"
 export KERBEROS="true"
-export KERBEROS_USER="superman"
+export KERBEROS_USER="francois"
 export KERBEROS_REALM="FRISCH.COM"
-export KERBEROS_USER_KEYTAB="/home/superman/superman.keytab"
+export KERBEROS_USER_KEYTAB="/home/francois/francois.keytab"
 
 # FreeIPA
 export IPA_USE="true"
@@ -62,6 +63,7 @@ function usage()
     echo ""
     echo "  --cluster-name=$CLUSTER_NAME Required as it will be the name of the cluster to interact with (Default) "
     echo "  --cm-host=$CM_HOST : Required to interact with components in the cluster (Default) "
+    echo "  --edge-host=$EDGE_HOST : Required to launch data generation from this node (Default) "
     echo "  --ssh-key=$SSH_KEY : Required to interact with an host (cm in fact) or provide a password (Default) "
     echo "  --ssh-password=$SSH_PASSWORD : Required to interact with an host (cm in fact) or provide a ssh-key (Default) "
     echo ""
@@ -115,6 +117,9 @@ while [ "$1" != "" ]; do
             ;;
         --cm-host)
             CM_HOST=$VALUE
+            ;;
+        --edge-host)
+            EDGE_HOST=$VALUE
             ;;
         --ssh-key)
             SSH_KEY=$VALUE
@@ -228,6 +233,9 @@ fi
 echo "
 [cloudera_manager]
 ${CM_HOST}
+
+[edge]
+${EDGE_HOST}
 
 [all:vars]
 ansible_connection=ssh

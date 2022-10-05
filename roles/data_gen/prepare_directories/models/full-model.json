@@ -92,7 +92,8 @@
     },
     {
       "name": "name",
-      "type": "NAME"
+      "type": "NAME",
+      "filters": ["France"]
     },
     {
       "name": "country",
@@ -178,6 +179,22 @@
       "type": "LINK",
       "conditionals": {
         "link": "$person.department"
+      }
+    },
+    {
+      "name": "phone_number",
+      "type": "PHONE",
+      "filters": ["France"]
+    },
+    {
+      "name": "uuid",
+      "type": "UUID"
+    },
+    {
+      "name": "email_from_name",
+      "type": "STRING",
+      "conditionals": {
+        "injection": "toto_${name}@our_company.com"
       }
     }
   ],

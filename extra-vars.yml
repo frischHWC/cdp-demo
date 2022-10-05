@@ -7,6 +7,9 @@ cloudera_manager_host: ${CM_HOST}
 cloudera_manager_user: ${CM_USER} 
 cloudera_manager_password: ${CM_PASSWORD}
 
+# Edge Node for data gen
+edge_host: ${EDGE_HOST}
+
 # Ranger info required
 ranger_user: ${RANGER_USER}
 ranger_password: ${RANGER_PASSWORD}

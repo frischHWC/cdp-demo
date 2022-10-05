@@ -39,6 +39,20 @@
     - user_creation   
     - free_ipa
 
+- name: Create User's directories on all machines
+  hosts: all
+  gather_facts: false
+  strategy: free
+  tasks: 
+    - name: create User's directory
+      include_role:
+        name: user_creation/users_directories
+      with_items: "{{ users }}"
+      vars:
+        user: "{{ item }}"
+  tags: 
+    - user_creation   
+
 - name: Create keytabs for users
   hosts: cloudera_manager
   gather_facts: false

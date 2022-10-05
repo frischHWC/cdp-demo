@@ -20,6 +20,11 @@ ranger_policies:
     users: ["superman", "batman"]
     resources: ["random_datagen*"]  
 
+  - name: "Hive Policy for superman"
+    type: hive
+    users: ["superman"]
+    resources: ["finance*"] 
+
   - name: "Kafka Policy for superman & batman"
     type: kafka
     users: ["superman", "batman"]
@@ -61,3 +66,4 @@ ranger_policies:
     type: hive
     users: ["superman", "francois"]
     resources: ["telco"] 
+
