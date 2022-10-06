@@ -23,16 +23,40 @@
   when: model.number_of_batches is not defined
 
 - set_fact:
+    batches: "{{ model.number_of_batches }}"
+  when: model.number_of_batches is defined
+
+- set_fact:
     rows: "10"
   when: model.number_of_rows is not defined
+
+- set_fact:
+    rows: "{{ model.number_of_rows }}"
+  when: model.number_of_rows is defined  
 
 - set_fact:
     threads: "1"
   when: model.threads is not defined
 
 - set_fact:
+    threads: "{{ model.threads }}"
+  when: model.threads is defined  
+
+- set_fact:
     interval: "360"
   when: model.interval is not defined
+
+- set_fact:
+    interval: "{{ model.interval }}"
+  when: model.interval is defined  
+
+- set_fact:
+    scheduled: "false"
+  when: model.scheduled is not defined
+
+- set_fact:
+    scheduled: "{{ model.scheduled }}"
+  when: model.scheduled is defined  
   
   
 - name: Launch Data Generation
@@ -46,7 +70,7 @@
     status_code: 200
     validate_certs: no
     force_basic_auth: yes
-  when: model.scheduled == "false"
+  when: scheduled == "false"
 
 
 - name: Schedule Data Generation
@@ -60,4 +84,4 @@
     status_code: 200
     validate_certs: no
     force_basic_auth: yes
-  when: model.scheduled == "true"
+  when: scheduled == "true"
