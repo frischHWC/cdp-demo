@@ -43,13 +43,8 @@ target_dir: ${TARGET_DIR}
 java_home: ${JAVA_HOME_PATH}
 
 # Data Gen Settings
-data_gen_use_git: ${DATA_GEN_USE_GIT}
-data_gen_git_url: ${DATA_GEN_GIT_URL}
-data_gen_git_branch: ${DATA_GEN_GIT_BRANCH}
-redeploy_datagen: ${REDEPLOY_DATAGEN}
 datagen_user: ${DATAGEN_USER}
 datagen_password: ${DATAGEN_PASSWORD}
-datagen_exists: ${DATAGEN_EXISTS}
 
 # Users creation settings
 create_hdfs_paths: ${CREATE_HDFS_PATHS}

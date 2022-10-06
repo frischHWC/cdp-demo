@@ -28,7 +28,7 @@ export IPA_PASSWORD="Cloudera1234"
 export IPA_SERVER=""
 
 # DEBUG
-export DEBUG=true
+export DEBUG=false
 export LOG_DIR="/tmp/cdp_demo_logs/"$(date +%m-%d-%Y-%H-%M-%S)
 
 # Steps to Process
@@ -44,13 +44,8 @@ export TARGET_DIR="/root/cdp-demo"
 
 # Data Load specific (for testing purposes mainly)
 export JAVA_HOME_PATH="/usr/lib/jvm/java-11/"
-export DATA_GEN_USE_GIT="false"
-export DATA_GEN_GIT_URL="https://github.com/frischHWC/datagen"
-export DATA_GEN_GIT_BRANCH="main"
-export REDEPLOY_DATAGEN="false"
 export DATAGEN_USER="admin"
 export DATAGEN_PASSWORD="admin"
-export DATAGEN_EXISTS="false"
 
 # Users Creation Settings
 export CREATE_HDFS_PATHS="true"
@@ -98,13 +93,8 @@ function usage()
     echo "  --target-dir=$TARGET_DIR (Default) $TARGET_DIR"
     echo ""
     echo "  --java-home=$JAVA_HOME_PATH (Default) $JAVA_HOME_PATH"
-    echo "  --data-gen-use-git=$DATA_GEN_USE_GIT (Default) $DATA_GEN_USE_GIT "
-    echo "  --data-gen-git-url=$DATA_GEN_GIT_URL (Default) $DATA_GEN_GIT_URL "
-    echo "  --data-gen-git-branch=$DATA_GEN_GIT_BRANCH (Default) $DATA_GEN_GIT_BRANCH "
-    echo "  --redeploy-datagen=$REDEPLOY_DATAGEN (Default) $REDEPLOY_DATAGEN "
     echo "  --datagen-user=$DATAGEN_USER (Default) $DATAGEN_USER "
     echo "  --datagen-password=$DATAGEN_PASSWORD (Default) $DATAGEN_PASSWORD "
-    echo "  --datagen-exists=${DATAGEN_EXISTS} (Default) ${DATAGEN_EXISTS}"
     echo ""
     echo "  --create-keytabs=$CREATE_KEYTABS (Default) $CREATE_KEYTABS "
     echo "  --create-hdfs-paths=$CREATE_HDFS_PATHS (Default) $CREATE_HDFS_PATHS "
@@ -201,27 +191,12 @@ while [ "$1" != "" ]; do
         --java-home)
             JAVA_HOME_PATH=$VALUE
             ;;
-        --data-gen-git-url)
-            DATA_GEN_GIT_URL=$VALUE
-            ;;
-        --data-gen-git-branch)
-            DATA_GEN_GIT_BRANCH=$VALUE
-            ;;  
-        --data-gen-use-git)   
-            DATA_GEN_USE_GIT=$VALUE
-            ;;
         --datagen-user)   
             DATAGEN_USER=$VALUE
             ;; 
         --datagen-password)   
             DATAGEN_PASSWORD=$VALUE
-            ;;
-        --datagen-exists)
-            DATAGEN_EXISTS=$VALUE
-            ;;       
-        --redeploy-datagen)
-            REDEPLOY_DATAGEN=$VALUE
-            ;;    
+            ;; 
         --create-keytabs)   
             CREATE_KEYTABS=$VALUE
             ;;
@@ -330,39 +305,7 @@ fi
 
 if [ "${DATA_GENERATION}" = "true" ] 
 then
-    echo "############ Generates Data - 1/3 Setup ############"
-    if [ "${DEBUG}" = "true" ]
-    then
-        echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} -e @group_vars/all/data_gen.yml playbooks/datagen_setup.yml  "
-        echo " Follow advancement at: ${LOG_DIR}/data_generation.log "
-    fi
-    ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} -e @group_vars/all/data_gen.yml playbooks/datagen_setup.yml 2>&1 > ${LOG_DIR}/data_generation.log
-    OUTPUT=$(tail -20 ${LOG_DIR}/data_generation.log | grep -A20 RECAP | grep -v "failed=0" | wc -l | xargs)
-    if [ "${OUTPUT}" == "2" ]
-    then
-      echo " SUCCESS: Generation of data went succesfully "
-    else
-      echo " FAILURE: Could not generate data " 
-      echo " See details in file: ${LOG_DIR}/data_generation.log "
-      exit 1
-    fi
-    echo "############ Generates Data  - 2/3 Creation ############"
-    if [ "${DEBUG}" = "true" ]
-    then
-        echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} -e @group_vars/all/data_gen.yml playbooks/datagen_creation.yml  "
-        echo " Follow advancement at: ${LOG_DIR}/data_generation.log "
-    fi
-    ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} -e @group_vars/all/data_gen.yml playbooks/datagen_creation.yml 2>&1 >> ${LOG_DIR}/data_generation.log
-    OUTPUT=$(tail -20 ${LOG_DIR}/data_generation.log | grep -A20 RECAP | grep -v "failed=0" | wc -l | xargs)
-    if [ "${OUTPUT}" == "2" ]
-    then
-      echo " SUCCESS: Generation of data went succesfully "
-    else
-      echo " FAILURE: Could not generate data " 
-      echo " See details in file: ${LOG_DIR}/data_generation.log "
-      exit 1
-    fi
-    echo "############ Generates Data  - 3/3 Launch ############"
+    echo "############ Generates Data ############"
     if [ "${DEBUG}" = "true" ]
     then
         echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} -e @group_vars/all/data_gen.yml playbooks/data_generation.yml  "

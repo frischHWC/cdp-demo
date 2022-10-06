@@ -18,8 +18,9 @@ CDP - Demo consists of 4 independent steps:
 
 - Have a running and working CDP cluster with CM access
 
+- In your Cluster, have deployed Datagen as a Service if you want to generate data (see here for details on how to install it: link:https://github.com/frischHWC/datagen#how-to-deploy-it-on-cdp-[https://github.com/frischHWC/datagen#how-to-deploy-it-on-cdp-])
 
-__ Note: Only on CDP PvC 7.1.7 & CM 7.4.4+ (Java 11 required for Random Data Generation) __
+__ Note: Only on CDP PvC 7.1.7 & CM 7.4.4+ (Java 11 required for Data Generation) __
 
 
 ## How to run it ? 

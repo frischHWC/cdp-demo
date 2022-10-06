@@ -1,7 +1,12 @@
 ---
 ###########################################
 ############# DATA GENERATION #############
-
+- name: Prepare Datagen directories
+  hosts: edge
+  gather_facts: false
+  roles: 
+    - data_gen/prepare_directories
+    
 - name: Get Datagen configs
   hosts: edge
   gather_facts: false
