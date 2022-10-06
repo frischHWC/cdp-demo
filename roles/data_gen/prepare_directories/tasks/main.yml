@@ -1,37 +1,34 @@
 ---
 - name: Clean Directory for this project
   file:
-    path: "{{ target_dir }}/random-datagen/"
+    path: "{{ target_dir }}/datagen/"
     state: absent
+
 - name: Create Directory for this project
   file:
-    path: "{{ target_dir }}/random-datagen/"
+    path: "{{ target_dir }}/datagen/"
     state: directory
     mode: '0755'
+
 - name: Create Model Directory
   file:
-    path: "{{ target_dir }}/random-datagen/models/"
+    path: "{{ target_dir }}/datagen/models/"
     state: directory
     mode: '0755'
 - name: Create Extra Data Directory
   file:
-    path: "{{ target_dir }}/random-datagen/extra_data/"
+    path: "{{ target_dir }}/datagen/extra_data/"
     state: directory
     mode: '0755'
-
-- name: Copy config.properties to machine
-  template:
-    src: config.properties
-    dest: /tmp/config-rd.properties
 
 - name: Copy models to machine
   template: 
     src: "{{ item.src }}"
-    dest: "{{ target_dir }}/random-datagen/models/"
+    dest: "{{ target_dir }}/datagen/models/"
   with_filetree: "{{ role_path }}/models/"
 
 - name: Copy extra_data files
   template: 
     src: "{{ item.src }}"
-    dest: "{{ target_dir }}/random-datagen/extra_data/"
+    dest: "{{ target_dir }}/datagen/extra_data/"
   with_filetree: "{{ role_path }}/extra_data/"

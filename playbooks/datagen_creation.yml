@@ -1,0 +1,11 @@
+---
+- import_playbook: '/tmp/datagen-repo/dev-support/deployment/create_datagen.yml'
+  when: not datagen_exists or redeploy_datagen
+
+- import_playbook: '/tmp/datagen-repo/dev-support/deployment/install_datagen.yml'
+  when: not datagen_exists or redeploy_datagen
+
+- import_playbook: '/tmp/datagen-repo/dev-support/deployment/launch_datagen.yml'
+  when: not datagen_exists or redeploy_datagen
+
+

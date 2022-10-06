@@ -2,42 +2,16 @@
 ###########################################
 ############# DATA GENERATION #############
 
-- name: Auto-Configure
+- name: Get Datagen configs
   hosts: edge
   gather_facts: false
   roles: 
     - auto_configure/cm-config
-    - auto_configure/all-config
-    - { role: auto_configure/zookeeper-config, when: config_zookeeper }
-    - { role: auto_configure/hive-config, when: config_hive }
-    - { role: auto_configure/hbase-config, when: config_hbase }
-    - { role: auto_configure/solr-config, when: config_solr }
-    - { role: auto_configure/kudu-config, when: config_kudu }
-    - { role: auto_configure/ozone-config, when: config_ozone }
-    - { role: auto_configure/hdfs-config, when: config_hdfs }
-    - { role: auto_configure/schema-registry-config, when: config_schema_registry }
-    - { role: auto_configure/kafka-config, when: config_kafka }
-  tags: 
-    - auto_configure 
-    - data
-
-- name: Preparation of Data Generation
-  hosts: edge
-  gather_facts: false
-  environment: 
-    JAVA_HOME: "{{ java_home }}"
-  roles: 
-    - prepare_deployments
-    - data_gen/prepare_directories
-    - data_gen/install_project
-  tags:
-    - data  
+    - data_gen/get_dg_info
 
 - name: Data Generation 
   hosts: edge
   gather_facts: false
-  environment: 
-    JAVA_HOME: "{{ java_home }}"
   tasks:
     - name: Run Data Generation foreach model
       include_role:
@@ -47,4 +21,3 @@
       with_items: "{{ models }}"
   tags:
     - data
-    

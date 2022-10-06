@@ -1,0 +1,79 @@
+---
+- set_fact:
+    dg_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'DATAGEN'].name | [0]"
+
+- name: DEBUG - dg_service_name
+  debug:
+    msg: "{{ dg_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get DG full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ dg_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: dg_full_config
+
+
+- name: Get DG full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ dg_service_name }}/roleConfigGroups/{{ dg_service_name }}-DATAGEN_SERVER-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: dg_server_full_config
+
+
+- set_fact:
+    dg_ssl: "{{ dg_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].value | [0]"
+
+- set_fact:
+    dg_ssl: "{{ dg_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'ssl_enabled'].default | [0]"
+  when: dg_ssl == ""
+
+- name: DEBUG - dg_ssl
+  debug:
+    msg: "{{ dg_ssl }}"
+  when: debug | default(false)
+
+- set_fact:
+    dg_protocol: "{{ 'https' if dg_ssl else 'http' }}"
+
+- name: DEBUG - dg_protocol
+  debug:
+    msg: "{{ dg_protocol }}"
+  when: debug | default(false)
+
+- set_fact:
+    dg_port: "{{ dg_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'app_port'].value | [0]"
+
+- set_fact:
+    dg_port: "{{ dg_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'app_port'].default | [0]"
+  when: dg_ssl == ""
+
+- name: DEBUG - dg_port
+  debug:
+    msg: "{{ dg_port }}"
+  when: debug | default(false)

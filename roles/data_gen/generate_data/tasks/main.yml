@@ -1,33 +1,63 @@
 ---
+# TODO: Transform this as API call
+
+- set_fact: 
+    datagen_url: "{{ dg_protocol }}://{{ edge_host }}:{{ dg_port }}"
+
+- name: DEBUG - datagen_url
+  debug:
+    msg: "{{ datagen_url }}"
+  when: debug | default(false)
+
 - set_fact:
-    job_start_cmd: "{{ java_home }}bin/java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar {{ target_dir }}/random-datagen/random-datagen.jar {{ target_dir }}/random-datagen/models/{{ model.file_name }} {{ model.number_of_rows }} {{ model.number_of_batches }}"
-    
+    sink_list_for_api: "{% for sink in model.sinks %}&sink={{ sink }}{% endfor %}"  
 
-- name: Add Data Generation to local crontab 
-  cron:
-    name: "Data Gen for {{ model.file_name }} to {{ sink }}"
-    minute: "{{ model.frequency.minute }}"
-    hour: "{{ model.frequency.hour }}"
-    day: "{{ model.frequency.day }}"
-    job: "cd {{ target_dir }}/random-datagen/ ; {{ job_start_cmd }} {{ sink }}"
-  loop_control:
-    loop_var: sink
-  loop: "{{ model.sinks }}"
-  when: model.scheduler is defined and model.scheduler == 'cron'
+- set_fact:
+    model_file_path: "{{ target_dir }}/datagen/models/{{ model.file_name }}"
 
-- name: Generates data 
-  command:
-    cmd: "{{ job_start_cmd }} {{ sink }}"
-    chdir: "{{ target_dir }}/random-datagen/"
-  ignore_errors: yes
-  loop_control:
-    loop_var: sink
-  loop: "{{ model.sinks }}"
-  when: model.scheduler is not defined or model.scheduler == 'none'
+- set_fact:
+    model_file_path_for_api: "{{ model_file_path | replace('/','%2F') }}"  
 
-# TODO: Add Oozie as a scheduler: 
+- set_fact:
+    batches: "1"
+  when: model.number_of_batches is not defined
 
-# TODO: Create an HDFS dir /tmp/data_gen with config.properties/log4j.properties/random-datagen.jar in it and also models/ with all models in it
-# TODO: Foreach sink: Template config.properties & coordinator.xml + Copy workflow.xml 
-# TODO: Foreach sink, create HDFS dir: {{ hdfs_url }}/tmp/workflows/{{ file_name }}_{{ sink }}/ & push 3 files to hdfs (config.properties & coordinator.xml & workflow.xml)
-# TODO: Foreach sink, create an oozie job and schedule it
+- set_fact:
+    rows: "10"
+  when: model.number_of_rows is not defined
+
+- set_fact:
+    threads: "1"
+  when: model.threads is not defined
+
+- set_fact:
+    interval: "360"
+  when: model.interval is not defined
+  
+  
+- name: Launch Data Generation
+  uri: 
+    url: "{{ datagen_url }}/datagen/multiplesinks?batches={{ batches }}&rows={{ rows }}&model={{ model_file_path_for_api }}&threads={{ threads }}{{ sink_list_for_api }}"
+    method: POST
+    user: "{{ datagen_user }}"
+    password: "{{ datagen_password }}"
+    return_content: yes
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  when: model.scheduled == "false"
+
+
+- name: Schedule Data Generation
+  uri: 
+    url: "{{ datagen_url }}/datagen/multiplesinks?batches={{ batches }}&rows={{ rows }}&model={{ model_file_path_for_api }}&threads={{ threads }}&delay_between_executions_seconds={{ interval }}&scheduled=true&{{ sink_list_for_api }}"
+    method: POST
+    user: "{{ datagen_user }}"
+    password: "{{ datagen_password }}"
+    return_content: yes
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  when: model.scheduled == "true"

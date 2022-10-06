@@ -1,0 +1,14 @@
+---
+- name: Data Generation as a Service
+  hosts: localhost
+  gather_facts: false
+  roles: 
+    - { role: data_gen/clone_project , when: data_gen_use_git }
+
+- name: Prepare Datagen directories
+  hosts: edge
+  gather_facts: false
+  roles: 
+    - data_gen/prepare_directories
+
+    

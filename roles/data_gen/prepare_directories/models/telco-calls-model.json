@@ -48,6 +48,9 @@
     {"HBASE_NAMESPACE": "telco"},
     {"KAFKA_TOPIC": "random_datagen_telco_calls"},
     {"OZONE_VOLUME": "telco_calls"},
+    {"OZONE_BUCKET":  "telco"},
+    {"OZONE_KEY_NAME":  "calls"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/telco-calls/"},
     {"SOLR_COLLECTION": "telco_calls"},
     {"HIVE_DATABASE": "telco"},
     {"HIVE_TABLE_NAME":  "calls"},
@@ -60,8 +63,6 @@
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "account_id_calling"},
     {"HBASE_PRIMARY_KEY":  "account_id_calling"},
-    {"OZONE_BUCKET":  "antennas_code"},
-    {"OZONE_KEY":  "account_id_calling"},
     {"KUDU_PRIMARY_KEYS":  "account_id_calling,account_id_receiving"},
     {"KUDU_HASH_KEYS":  "account_id_receiving"},
     {"KUDU_RANGE_KEYS":  "account_id_calling,account_id_receiving"}
@@ -73,6 +74,8 @@
     {"KUDU_REPLICAS":  1},
     {"ONE_FILE_PER_ITERATION":  true},
     {"KAFKA_MESSAGE_TYPE":  "json"},
+    {"KAFKA_JAAS_FILE_PATH":  "/tmp/kafka.jaas"},
+    {"SOLR_JAAS_FILE_PATH":  "/tmp/solr.jaas"},
     {"HIVE_THREAD_NUMBER":  1},
     {"HIVE_ON_HDFS":  true},
     {"HIVE_TEZ_QUEUE_NAME":  "root.default"},
