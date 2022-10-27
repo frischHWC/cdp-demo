@@ -1,15 +1,160 @@
 ---
-- name: Post Ranger policies defined in ranger_policies variable
+- name: Post HDFS Ranger policies 
   uri: 
     url: "{{ ranger_url }}/service/public/v2/api/policy"
     method: POST
     user: "{{ ranger_user }}"
     password: "{{ ranger_password }}"
     return_content: yes
-    body: "{{ lookup('template', '{{ item.type }}.json' ) }}"
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
     body_format: json
     status_code: 200
     validate_certs: no
     force_basic_auth: yes
-  loop: "{{ ranger_policies }}"
+  loop: "{{ ranger_services_hdfs }}"
   ignore_errors: yes
+  when: policy.type == 'hdfs'
+
+- name: Post Hbase Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_hbase }}"
+  ignore_errors: yes
+  when: policy.type == 'hbase'
+
+- name: Post Hive Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_hive }}"
+  ignore_errors: yes
+  when: policy.type == 'hive'
+
+- name: Post Kafka Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_kafka }}"
+  ignore_errors: yes
+  when: policy.type == 'kafka'
+
+- name: Post Kudu Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_kudu }}"
+  ignore_errors: yes
+  when: policy.type == 'kudu'
+
+- name: Post Nifi Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_nifi }}"
+  ignore_errors: yes
+  when: policy.type == 'nifi'
+
+- name: Post Ozone Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_ozone }}"
+  ignore_errors: yes
+  when: policy.type == 'ozone'
+
+- name: Post Schema Registry Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_schemaregistry }}"
+  ignore_errors: yes
+  when: policy.type == 'schemaregistry'
+
+- name: Post SolR Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_solr }}"
+  ignore_errors: yes
+  when: policy.type == 'solr'
+
+- name: Post YARN Ranger policies 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/policy"
+    method: POST
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body: "{{ lookup('template', '{{ policy.type }}.json' ) }}"
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  loop: "{{ ranger_services_yarn }}"
+  ignore_errors: yes
+  when: policy.type == 'yarn'

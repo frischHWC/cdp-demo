@@ -40,7 +40,7 @@ export DATA_GENERATION="true"
 export PROJECTS_DEPLOYMENT="true"
 
 # Deployments settings
-export TARGET_DIR="/root/cdp-demo"
+export TARGET_DIR="/tmp/cdp-demo"
 
 # Data Load specific (for testing purposes mainly)
 export JAVA_HOME_PATH="/usr/lib/jvm/java-11/"

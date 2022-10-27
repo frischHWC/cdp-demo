@@ -1,6 +1,6 @@
 {
     "policyType": "0",
-    "name": "{{ item.name }}",
+    "name": "{{ policy.name }}",
     "isEnabled": true,
     "policyPriority": 0,
     "policyLabels": [
@@ -11,7 +11,7 @@
     "resources": {
       "nifi-resource": {
         "values": [
-          {% for i in item.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+          {% for i in policy.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
         ],
         "isRecursive": false,
         "isExcludes": false
@@ -21,7 +21,7 @@
     "policyItems": [
       {
         "users": [
-          {% for i in item.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+          {% for i in policy.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
         ],
         "delegateAdmin": true,
         "accesses": [
@@ -45,5 +45,5 @@
     "denyExceptions": [
       
     ],
-    "service": "{{ cluster_name | replace('-','_') }}_stream_NIFI_1"
+    "service": "{{ item }}"
   }

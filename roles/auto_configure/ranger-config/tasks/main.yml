@@ -110,3 +110,160 @@
   debug:
     msg: "{{ ranger_url }}"
   when: debug | default(false)
+
+
+# Get all services as a list
+
+- name: Get Ranger services 
+  uri: 
+    url: "{{ ranger_url }}/service/public/v2/api/service"
+    method: GET
+    user: "{{ ranger_user }}"
+    password: "{{ ranger_password }}"
+    return_content: yes
+    body_format: json
+    status_code: 200
+    validate_certs: no
+    force_basic_auth: yes
+  register: services
+
+- set_fact:
+    ranger_services_hdfs: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'hdfs'].name"
+
+- name: DEBUG - ranger_services_hdfs
+  debug:
+    msg: "{{ ranger_services_hdfs }}"
+  when: debug | default(false)
+
+- set_fact:
+    ranger_services_hbase: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'hbase'].name"
+
+- name: DEBUG - ranger_services_hbase
+  debug:
+    msg: "{{ ranger_services_hbase }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_yarn: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'yarn'].name"
+
+- name: DEBUG - ranger_services_yarn
+  debug:
+    msg: "{{ ranger_services_yarn }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_hive: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'hive'].name"
+
+- name: DEBUG - ranger_services_hive
+  debug:
+    msg: "{{ ranger_services_hive }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_knox: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'knox'].name"
+
+- name: DEBUG - ranger_services_knox
+  debug:
+    msg: "{{ ranger_services_knox }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_ozone: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'ozone'].name"
+
+- name: DEBUG - ranger_services_ozone
+  debug:
+    msg: "{{ ranger_services_ozone }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_kafka: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'kafka'].name"
+
+- name: DEBUG - ranger_services_kafka
+  debug:
+    msg: "{{ ranger_services_kafka }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_solr: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'solr'].name"
+
+- name: DEBUG - ranger_services_solr
+  debug:
+    msg: "{{ ranger_services_solr }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_atlas: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'atlas'].name"
+
+- name: DEBUG - ranger_services_atlas
+  debug:
+    msg: "{{ ranger_services_atlas }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_nifi: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'nifi'].name"
+
+- name: DEBUG - ranger_services_nifi
+  debug:
+    msg: "{{ ranger_services_nifi }}"
+  when: debug | default(false)
+
+- set_fact:
+    ranger_services_nifiregistry: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'nifi-registry'].name"
+
+- name: DEBUG - ranger_services_nifiregistry
+  debug:
+    msg: "{{ ranger_services_nifiregistry }}"
+  when: debug | default(false)
+
+- set_fact:
+    ranger_services_kudu: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'kudu'].name"
+
+- name: DEBUG - ranger_services_kudu
+  debug:
+    msg: "{{ ranger_services_kudu }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    ranger_services_schemaregistry: "{{ services.json | community.general.json_query(query) }}"
+  vars:
+    query: "[?type == 'schema-registry'].name"
+
+- name: DEBUG - ranger_services_schemaregistry
+  debug:
+    msg: "{{ ranger_services_schemaregistry }}"
+  when: debug | default(false)
+
+  

@@ -1,69 +1,102 @@
 ---
 ranger_policies:
-  - name: "HDFS Policy for superman"
-    type: hdfs
-    users: ["superman"]
-    resources: ["/tmp/", "/home/superman"]
-
-  - name: "HDFS Policy for batman"
-    type: hdfs
-    users: ["batman"]
-    resources: ["/tmp/", "/home/batman"]
-
-  - name: "Hbase Policy for superman & batman"
-    type: hbase
-    users: ["superman", "batman"]
-    resources: ["random_datagen:*", "rd:*"] 
-
-  - name: "Hive Policy for superman & batman"
-    type: hive
-    users: ["superman", "batman"]
-    resources: ["random_datagen*"]  
-
-  - name: "Hive Policy for superman"
-    type: hive
-    users: ["superman"]
-    resources: ["finance*"] 
-
-  - name: "Kafka Policy for superman & batman"
-    type: kafka
-    users: ["superman", "batman"]
-    resources: ["random_datagen*"]  
-
-  - name: "Kudu Policy for superman & batman"
-    type: kudu
-    users: ["superman", "batman"]
-    resources: ["random_datagen*"]  
-
-  - name: "Nifi Policy for superman & batman"
-    type: nifi
-    users: ["superman", "batman"]
-    resources: ["/*"]  
-
-  - name: "Ozone Policy for superman & batman"
-    type: ozone
-    users: ["superman", "batman"]
-    resources: ["random-datagen*"]  
-
-  - name: "SR Policy for superman & batman"
-    type: schema-registry
-    users: ["superman", "batman"]
-    resources: ["random_datagen*"]  
-
-  - name: "SolR Policy for superman & batman"
-    type: solr
-    users: ["superman", "batman"]
-    resources: ["random_datagen*"] 
-
-  - name: "YARN Policy for superman & batman"
-    type: yarn
-    users: ["superman", "batman"]
-    resources: ["root.default", "root.random_datagen"]  
+  # - name: "HDFS Policy for francois" # Name of the policy
+  #   type: hdfs # To which services it should create the policies: hdfs, hive, hbase, kafka, nifi, kudu, solr, schema-registry, yarn
+  #   users: ["francois"] # A list a users that will be granted access to these resources
+  #   resources: ["/tmp/", "/home/adrian"] # A list of resources which are: 
+  #     paths for hdfs or ozone, databases for hive or kudu, topics for kafka, collections for solr, queues for yarn, resources for nifi, schema for schema-registry
 
 # Add other policies below in the same way than the one above   
 
-  - name: "Hive Policy on telco"
+  - name: "HDFS Policy for adrian"
+    type: hdfs
+    users: ["adrian"]
+    resources: ["/tmp/", "/home/adrian"]
+
+  - name: "HDFS Policy for anoop"
+    type: hdfs
+    users: ["anoop"]
+    resources: ["/tmp/", "/home/anoop"]
+
+  - name: "Hbase Policy for anoop"
+    type: hbase
+    users: ["anoop", "datagen"]
+    resources: ["banking:*"]  
+
+  - name: "Hbase Policy for adrian"
+    type: hbase
+    users: ["adrian", "datagen"]
+    resources: ["finance:*"] 
+
+  - name: "Hive Policy for anoop"
     type: hive
-    users: ["superman", "francois"]
-    resources: ["telco"] 
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "Hive Policy for adrian"
+    type: hive
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "Kafka Policy for anoop"
+    type: kafka
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "Kafka Policy for adrian"
+    type: kafka
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "Kudu Policy for anoop"
+    type: kudu
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "Kudu Policy for adrian"
+    type: kudu
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "Nifi Policy for francois"
+    type: nifi
+    users: ["francois"]
+    resources: ["/*"]  
+
+  - name: "Ozone Policy for anoop"
+    type: ozone
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "Ozone Policy for adrian"
+    type: ozone
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "SR Policy for anoop"
+    type: schema-registry
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "SR Policy for adrian"
+    type: schema-registry
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "SolR Policy for anoop"
+    type: solr
+    users: ["anoop", "datagen"]
+    resources: ["banking*"]  
+
+  - name: "SolR Policy for adrian"
+    type: solr
+    users: ["adrian", "datagen"]
+    resources: ["finance*"] 
+
+  - name: "YARN Policy for francois"
+    type: yarn
+    users: ["francois", "datagen"]
+    resources: ["root.default", "root.datagen"]  
+
+
 

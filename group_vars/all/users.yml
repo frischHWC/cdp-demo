@@ -1,13 +1,31 @@
 ---
 users:
-  - name: superman
-    local_dir: /home/superman # default is /home/{{ name }}
-    hdfs_dir: /user/superman # default is /user/{{ name }}
-    use_keytab: true # default is true
-    password: Cloudera1234 # default is Cloudera1234
-    groups: ["hadoop"] # default is user name
+  # - name: francois
+  #   local_dir: /home/francois # default is /home/{{ name }}
+  #   hdfs_dir: /user/francois # default is /user/{{ name }}
+  #   use_keytab: true # default is true
+  #   password: Cloudera1234 # default is Cloudera1234
+  #   groups: ["admin"] # default is user name
 
 # Add other users below in the same way than the one above
+  - name: francois
+    local_dir: /home/francois # default is /home/{{ name }}
+    hdfs_dir: /user/francois # default is /user/{{ name }}
+    use_keytab: true # default is true
+    password: Cloudera1234 # default is Cloudera1234
+    groups: ["finance", "banking", "admin"] # default is user name
 
-  - name: batman
+  - name: adrian
+    local_dir: /home/adrian # default is /home/{{ name }}
+    hdfs_dir: /user/adrian # default is /user/{{ name }}
+    use_keytab: true # default is true
+    password: Cloudera1234 # default is Cloudera1234
+    groups: ["finance"] # default is user name
+
+  - name: anoop
+    local_dir: /home/anoop # default is /home/{{ name }}
+    hdfs_dir: /user/anoop # default is /user/{{ name }}
+    use_keytab: true # default is true
+    password: Cloudera1234 # default is Cloudera1234
+    groups: ["banking"] # default is user name
 

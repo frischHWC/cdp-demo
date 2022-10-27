@@ -3,21 +3,57 @@ models:
   # - file_name: full-model.json # Model File name presents in roles/data_gen/models (See README to know how to add models file)
   #   sinks: [hdfs-parquet, hbase, hive] # A list of sinks where to produce data among: 
   #     hdfs-parquet, hdfs-orc, hdfs-json, hdfs-avro, hdfs-csv, hdfs-json, hbase, hive, kafka, kudu, ozone-parquet, ozone-orc, ozone-json, ozone-avro, ozone-csv, ozone-json, solr
-  #   number_of_rows: 1000 # Number of rows to produce on each batch
-  #   number_of_batches: 3 # Number of batch that program will launch a generation of data
-  #   interval: 100 # Interval between two launches (used only if scheduled is true)
+  #   number_of_rows: 10 # Number of rows to produce on each batch
+  #   number_of_batches: 1 # Number of batch that program will launch a generation of data
+  #   threads: 1 # Number of threads that will generate data
+  #   interval: 360 # Interval between two launches (used only if scheduled is true)
   #   scheduled: false # To schedule the job on an interval basis
 
-  - file_name: customer-model.json 
-    sinks: [hdfs-parquet, hive] 
-    number_of_rows: 10000
-    number_of_batches: 1 
-    threads: 1
+  - file_name: banking/atm.json
+    sinks: [hive] 
+    number_of_rows: 10000 
+    number_of_batches: 100  
+    threads: 10 
 
-  - file_name: transaction-model.json 
-    sinks: [kafka] 
-    number_of_rows: 100
-    number_of_batches: 10 
-    interval: 100
-    threads: 1
-    scheduled: true
+  - file_name: banking/atm-withdraw.json
+    sinks: [kafka, hive] 
+    number_of_rows: 1000 
+    number_of_batches: 10  
+    threads: 1 
+
+  - file_name: finance/stock-price.json
+    sinks: [hive, kafka] 
+    number_of_rows: 100 
+    number_of_batches: 1  
+    threads: 1 
+    scheduled: false
+
+  - file_name: finance/traders.json
+    sinks: [hive, kafka] 
+    number_of_rows: 1000 
+    number_of_batches: 1  
+    threads: 1 
+    scheduled: false
+
+  - file_name: finance/stock-price-transaction.json
+    sinks: [hive, kafka] 
+    number_of_rows: 100 
+    number_of_batches: 100  
+    threads: 1 
+    scheduled: false
+
+  - file_name: banking/bank-account-uk.json
+    sinks: [hive, ozone-parquet] 
+    number_of_rows: 100000 
+    number_of_batches: 100  
+    threads: 20 
+    scheduled: false
+
+  - file_name: banking/bank-account-us.json
+    sinks: [hive, ozone-parquet] 
+    number_of_rows: 100000 
+    number_of_batches: 100  
+    threads: 20 
+    scheduled: false
+
+

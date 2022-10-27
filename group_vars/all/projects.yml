@@ -12,6 +12,8 @@ projects:
   #   files_to_template: "" # config files list to lookup (to replace properties by the one of the cluster) (See README to get details on how to configure this file to be replaced)
   #   launch_command: "" # Shell command that will launch the program on the remote machine
 
+# Add other projects below as the one above
+
   - name: "hive_fake_full_data"
     release_type: "local_file"
     release_url: "../cdp-demo-examples/hive/hive_test.hql" 
@@ -35,8 +37,3 @@ projects:
     release_url: "https://github.com/frischHWC/yarn-submit/releases/download/CDP-7.1.7-V1/yarnsubmit-CDP-7.1.7-V1.tar.gz" 
     files_to_template: []
     launch_command: "chmod +x yarn-submit.sh ; ./yarn-submit.sh --keytab={{ kerb_keytab }} --kerberos-user={{ kerb_user }} --java-home={{ java_home }} commandsToLaunch " 
-
-# TODO: Be able to deploy files and project from local FS
-# TODO: Make git and tar url working
-
-# Add other projects below as the one above

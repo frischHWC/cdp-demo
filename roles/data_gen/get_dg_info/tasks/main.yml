@@ -71,7 +71,7 @@
     dg_port: "{{ dg_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'app_port'].default | [0]"
-  when: dg_ssl == ""
+  when: dg_port == ""
 
 - name: DEBUG - dg_port
   debug:

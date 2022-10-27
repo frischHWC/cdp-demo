@@ -3,11 +3,11 @@
   "guid": "...",
   "isEnabled": true,
   "version": 1,
-  "service": "cm_hbase",
-  "name": "{{ item.name }}",
+  "service": "{{ item }}",
+  "name": "{{ policy.name }}",
   "policyType": 0,
   "policyPriority": 0,
-  "description": "{{ item.name }}",
+  "description": "{{ policy.name }}",
   "isAuditEnabled": true,
   "resources": {
     "column-family": {
@@ -26,7 +26,7 @@
     },
     "table": {
       "values": [
-        {% for i in item.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+        {% for i in policy.resources %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
       ],
       "isExcludes": false,
       "isRecursive": false
@@ -57,7 +57,7 @@
         }
       ],
       "users": [
-        {% for i in item.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
+        {% for i in policy.users %}"{{ i }}"{% if not loop.last %},{% endif %}{% endfor %}
       ],
       "groups": [
         
@@ -72,7 +72,7 @@
     }
   ],
   "denyPolicyItems": [
-    
+      
   ],
   "allowExceptions": [
     

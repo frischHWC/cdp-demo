@@ -15,20 +15,39 @@
     path: "{{ target_dir }}/datagen/models/"
     state: directory
     mode: '0755'
+
 - name: Create Extra Data Directory
   file:
     path: "{{ target_dir }}/datagen/extra_data/"
     state: directory
     mode: '0755'
 
+
 - name: Copy models to machine
-  template: 
-    src: "{{ item.src }}"
+  copy: 
+    src: "{{ role_path }}/models/"
     dest: "{{ target_dir }}/datagen/models/"
-  with_filetree: "{{ role_path }}/models/"
 
 - name: Copy extra_data files
-  template: 
-    src: "{{ item.src }}"
+  copy: 
+    src: "{{ role_path }}/extra_data/"
     dest: "{{ target_dir }}/datagen/extra_data/"
-  with_filetree: "{{ role_path }}/extra_data/"
+
+
+- name: Set permissions for Extra Data Directory
+  file:
+    path: "{{ target_dir }}/datagen/extra_data/"
+    state: directory
+    mode: '0775'
+    owner: datagen
+    group: datagen
+    recurse: yes
+
+- name: Set permissions for Models Directory
+  file:
+    path: "{{ target_dir }}/datagen/models/"
+    state: directory
+    mode: '0775'
+    owner: datagen
+    group: datagen
+    recurse: yes

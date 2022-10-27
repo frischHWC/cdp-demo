@@ -1,6 +1,4 @@
 ---
-# TODO: Transform this as API call
-
 - set_fact: 
     datagen_url: "{{ dg_protocol }}://{{ edge_host }}:{{ dg_port }}"
 
@@ -10,13 +8,10 @@
   when: debug | default(false)
 
 - set_fact:
-    sink_list_for_api: "{% for sink in model.sinks %}&sink={{ sink }}{% endfor %}"  
+    sink_list_for_api: "{% for sink in model.sinks %}{{ sink }}{% if not loop.last %},{% endif %}{% endfor %}"  
 
 - set_fact:
     model_file_path: "{{ target_dir }}/datagen/models/{{ model.file_name }}"
-
-- set_fact:
-    model_file_path_for_api: "{{ model_file_path | replace('/','%2F') }}"  
 
 - set_fact:
     batches: "1"
@@ -57,31 +52,89 @@
 - set_fact:
     scheduled: "{{ model.scheduled }}"
   when: model.scheduled is defined  
-  
-  
+
+- set_fact:
+    user: "datagen"
+  when: model.user is not defined
+
+- set_fact:
+    user: "{{ model.user }}"
+  when: model.user is defined  
+
+- set_fact:
+    user_keytab: "/home/datagen/datagen.keytab"
+  when: model.user_keytab is not defined
+
+- set_fact:
+    user_keytab: "{{ model.user_keytab }}"
+  when: model.user_keytab is defined  
+
+# Doing a Curl instead of uri because not possible to send the json file without having any escapes hence corrupting the JSON file
 - name: Launch Data Generation
-  uri: 
-    url: "{{ datagen_url }}/datagen/multiplesinks?batches={{ batches }}&rows={{ rows }}&model={{ model_file_path_for_api }}&threads={{ threads }}{{ sink_list_for_api }}"
-    method: POST
+  shell: >
+    curl -k -u "{{ datagen_user }}":"{{ datagen_password }}"
+    -X POST "{{ datagen_url }}/datagen/multiplesinks" 
+    -H "accept: */*" 
+    -H "Content-Type: multipart/form-data" 
+    -F "batches={{ batches }}" 
+    -F "rows={{ rows }}"
+    -F "threads={{ threads }}"
+    -F "sinks={{ sink_list_for_api }}"
+    -F "kerb_user={{ user }}"
+    -F "kerb_keytab={{ user_keytab }}"
+    -F "model_file=@{{ model_file_path }};type=application/json" 
+  register: shell_answer
+  when: scheduled == false
+
+- set_fact:
+    command_uuid: "{{ shell_answer.stdout | from_json | community.general.json_query('commandUuid') }}"
+  when: scheduled == false  
+
+- name: "DEBUG - command_uuid"
+  debug:
+    msg: "{{ command_uuid }}"
+  when: scheduled == false
+
+- name: "DEBUG - command_uuid"
+  debug:
+    msg: "{{ datagen_url }}/command/getCommandStatus?commandUuid={{ command_uuid }}"
+  when: scheduled == false
+
+- name: Check that command finished
+  uri:
+    url: "{{ datagen_url }}/command/getCommandStatus?commandUuid={{ command_uuid }}"
     user: "{{ datagen_user }}"
     password: "{{ datagen_password }}"
-    return_content: yes
-    body_format: json
-    status_code: 200
-    validate_certs: no
-    force_basic_auth: yes
-  when: scheduled == "false"
-
-
-- name: Schedule Data Generation
-  uri: 
-    url: "{{ datagen_url }}/datagen/multiplesinks?batches={{ batches }}&rows={{ rows }}&model={{ model_file_path_for_api }}&threads={{ threads }}&delay_between_executions_seconds={{ interval }}&scheduled=true&{{ sink_list_for_api }}"
     method: POST
-    user: "{{ datagen_user }}"
-    password: "{{ datagen_password }}"
-    return_content: yes
-    body_format: json
-    status_code: 200
-    validate_certs: no
+    headers: 
+      Content-Type: application/json
+      Accept: application/json
     force_basic_auth: yes
-  when: scheduled == "true"
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: command_status
+  until: command_status.json|json_query('status') == 'FINISHED'
+  retries: 60
+  delay: 10
+
+ 
+# Doing a Curl instead of uri because not possible to send the json file without having any escapes hence corrupting the JSON file
+- name: Launch Scheduled Data Generation
+  shell: >
+    curl -k -u "{{ datagen_user }}":"{{ datagen_password }}"
+    -X POST "{{ datagen_url }}/datagen/multiplesinks" 
+    -H "accept: */*" 
+    -H "Content-Type: multipart/form-data" 
+    -F "batches={{ batches }}" 
+    -F "rows={{ rows }}"
+    -F "threads={{ threads }}"
+    -F "sinks={{ sink_list_for_api }}"
+    -F "kerb_user={{ user }}"
+    -F "kerb_keytab={{ user_keytab }}"
+    -F "scheduled=true"
+    -F "delay_between_executions_seconds={{ interval }}"
+    -F "model_file=@{{ model_file_path }};type=application/json" 
+  register: shell_answer
+  when: scheduled == true
