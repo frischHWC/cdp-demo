@@ -9,6 +9,12 @@ models:
   #   interval: 360 # Interval between two launches (used only if scheduled is true)
   #   scheduled: false # To schedule the job on an interval basis
 
+  - file_name: banking/customer-uk.json
+    sinks: [hdfs-json, hdfs-csv] 
+    number_of_rows: 1000 
+    number_of_batches: 10  
+    threads: 1
+
   - file_name: banking/atm.json
     sinks: [hive] 
     number_of_rows: 10000 
@@ -36,7 +42,7 @@ models:
     scheduled: false
 
   - file_name: finance/stock-price-transaction.json
-    sinks: [hive, kafka] 
+    sinks: [hive, kafka, kudu] 
     number_of_rows: 100 
     number_of_batches: 100  
     threads: 1 

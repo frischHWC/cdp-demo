@@ -38,7 +38,7 @@
     {"HIVE_DATABASE": "banking"},
     {"HIVE_TABLE_NAME":  "atm_withdraw"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "atm_withdraw_tmp"},
-    {"KUDU_TABLE_NAME":  "banking.atm_withdraw"},
+    {"KUDU_TABLE_NAME":  "banking.atm_withdraw_kudu"},
     {"LOCAL_FILE_PATH":  "/tmp/banking/atm_withdraw/"},
     {"LOCAL_FILE_NAME":  "banking-atm_withdraw"},
     {"AVRO_NAME":  "bankingatm_withdraw"}

@@ -49,7 +49,7 @@
     {"HIVE_DATABASE": "finance"},
     {"HIVE_TABLE_NAME":  "stock_price_transaction"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "stock_price_transaction_tmp"},
-    {"KUDU_TABLE_NAME":  "finance.stock_price_transaction"},
+    {"KUDU_TABLE_NAME":  "finance.stock_price_transaction_kudu"},
     {"LOCAL_FILE_PATH":  "/tmp/finance/stock_price_transaction/"},
     {"LOCAL_FILE_NAME":  "finance-stock_price_transaction"},
     {"AVRO_NAME":  "financestock_price_transaction"}

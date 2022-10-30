@@ -64,7 +64,7 @@
     {"HIVE_DATABASE": "banking"},
     {"HIVE_TABLE_NAME":  "bank_account"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "bank_account_tmp_us"},
-    {"KUDU_TABLE_NAME":  "banking.bank_account"},
+    {"KUDU_TABLE_NAME":  "banking.bank_account_kudu"},
     {"LOCAL_FILE_PATH":  "/tmp/banking/bank_account/"},
     {"LOCAL_FILE_NAME":  "banking-bank_account"},
     {"AVRO_NAME":  "bankingbank_account"}

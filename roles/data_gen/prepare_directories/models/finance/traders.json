@@ -44,7 +44,7 @@
     {"HIVE_DATABASE": "finance"},
     {"HIVE_TABLE_NAME":  "traders"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "traders_tmp"},
-    {"KUDU_TABLE_NAME":  "finance.traders"},
+    {"KUDU_TABLE_NAME":  "finance.traders_kudu"},
     {"LOCAL_FILE_PATH":  "/tmp/finance/traders/"},
     {"LOCAL_FILE_NAME":  "finance-traders"},
     {"AVRO_NAME":  "financetraders"}

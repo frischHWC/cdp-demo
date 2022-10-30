@@ -6,6 +6,47 @@ ranger_policies:
   #   resources: ["/tmp/", "/home/adrian"] # A list of resources which are: 
   #     paths for hdfs or ozone, databases for hive or kudu, topics for kafka, collections for solr, queues for yarn, resources for nifi, schema for schema-registry
 
+# Admin policies for francois & datagen
+  - name: "HDFS Admin Policy for francois"
+    type: hdfs
+    users: ["francois", "datagen"]
+    resources: ["/", "/user/francois/", "/*"]  
+
+  - name: "HBase Admin Policy for francois"
+    type: hbase
+    users: ["francois", "datagen"]
+    resources: ["*", "*:*"]  
+
+  - name: "Hive Admin Policy for francois"
+    type: hive
+    users: ["francois", "datagen"]
+    resources: ["*", "francois*"]  
+
+  - name: "Kafka Admin Policy for francois"
+    type: kafka
+    users: ["francois", "datagen"]
+    resources: ["*", "francois*"]  
+
+  - name: "Kudu Admin Policy for francois"
+    type: kudu
+    users: ["francois", "datagen"]
+    resources: ["*", "francois*"]  
+
+  - name: "Ozone Admin Policy for francois"
+    type: ozone
+    users: ["francois", "datagen"]
+    resources: ["*", "francois*"]  
+
+  - name: "SolR Admin Policy for francois"
+    type: solr
+    users: ["francois", "datagen"]
+    resources: ["*", "francois*"]  
+
+  - name: "YARN Admin Policy for francois"
+    type: yarn
+    users: ["francois", "datagen"]
+    resources: ["root", "root.francois", "root.datagen"]  
+
 # Add other policies below in the same way than the one above   
 
   - name: "HDFS Policy for adrian"
@@ -92,11 +133,3 @@ ranger_policies:
     type: solr
     users: ["adrian", "datagen"]
     resources: ["finance*"] 
-
-  - name: "YARN Policy for francois"
-    type: yarn
-    users: ["francois", "datagen"]
-    resources: ["root.default", "root.datagen"]  
-
-
-

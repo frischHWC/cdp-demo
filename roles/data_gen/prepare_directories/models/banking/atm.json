@@ -56,7 +56,7 @@
     {"HIVE_DATABASE": "banking"},
     {"HIVE_TABLE_NAME":  "atm"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "atm_tmp"},
-    {"KUDU_TABLE_NAME":  "banking.atm"},
+    {"KUDU_TABLE_NAME":  "banking.atm_kudu"},
     {"LOCAL_FILE_PATH":  "/tmp/banking/atm/"},
     {"LOCAL_FILE_NAME":  "banking-atm"},
     {"AVRO_NAME":  "bankingatm"}
