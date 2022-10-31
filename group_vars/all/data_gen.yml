@@ -28,35 +28,35 @@ models:
     threads: 1 
 
   - file_name: finance/stock-price.json
-    sinks: [hive, kafka] 
+    sinks: [kafka, hive] 
     number_of_rows: 100 
     number_of_batches: 1  
     threads: 1 
     scheduled: false
 
   - file_name: finance/traders.json
-    sinks: [hive, kafka] 
+    sinks: [kafka, hive] 
     number_of_rows: 1000 
     number_of_batches: 1  
     threads: 1 
     scheduled: false
 
   - file_name: finance/stock-price-transaction.json
-    sinks: [hive, kafka, kudu] 
+    sinks: [kafka, kudu, hive] 
     number_of_rows: 100 
     number_of_batches: 100  
     threads: 1 
     scheduled: false
 
   - file_name: banking/bank-account-uk.json
-    sinks: [hive, ozone-parquet] 
+    sinks: [ozone-parquet, hive] 
     number_of_rows: 100000 
     number_of_batches: 100  
     threads: 20 
     scheduled: false
 
   - file_name: banking/bank-account-us.json
-    sinks: [hive, ozone-parquet] 
+    sinks: [ozone-parquet, hive] 
     number_of_rows: 100000 
     number_of_batches: 100  
     threads: 20 
